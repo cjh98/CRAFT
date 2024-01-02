@@ -361,3 +361,11 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/UserSettings
+/Temp
+/ProjectSettings
+/Library
+/CRAFT_BurstDebugInformation_DoNotShip/Data/Plugins/x86_64
+/CRAFT.sln
+/Assembly-CSharp.csproj
+/.vsconfig
