@@ -18,6 +18,11 @@ public class Player : MonoBehaviour
     void Update()
     {
         CameraMovement();
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            Debug.Break();
+        }
     }
 
     void CameraMovement()
@@ -29,7 +34,6 @@ public class Player : MonoBehaviour
         moveSpeed = Input.GetKey(KeyCode.LeftShift) ? sprintSpeed : walkSpeed;
 
         transform.position += transform.forward * Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime;
+        transform.position += transform.right * Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime;
     }
-
-
 }

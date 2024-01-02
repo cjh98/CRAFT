@@ -2,7 +2,12 @@ using UnityEngine;
 
 public class LoadingScreen : MonoBehaviour
 {
-    private float time = 5.0f;
+    private float time;
+
+    private void Start()
+    {
+        time = World.instance.range / 2f;
+    }
 
     private void Update()
     {

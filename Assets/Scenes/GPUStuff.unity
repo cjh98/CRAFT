@@ -671,7 +671,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1793214719}
   - component: {fileID: 1793214720}
-  - component: {fileID: 1793214721}
   m_Layer: 0
   m_Name: World
   m_TagString: Untagged
@@ -711,35 +710,7 @@ MonoBehaviour:
   chunkDimensions: {x: 16, y: 200, z: 16}
   chunkDataPrefab: {fileID: 393607184177249191, guid: b6c191c97ae73c941946969be81af98b, type: 3}
   chunkMeshPrefab: {fileID: 2434145552892773456, guid: 2919c1487f5de49429faf7ab3b667bc3, type: 3}
---- !u!114 &1793214721
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1793214718}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cbee4e889a9e1247b3318848343e9f8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  blocks:
-  - name: Stone
-    upTextureIndex: 0
-    downTextureIndex: 0
-    leftRightTextureIndex: 0
-  - name: Dirt
-    upTextureIndex: 1
-    downTextureIndex: 1
-    leftRightTextureIndex: 1
-  - name: Grass
-    upTextureIndex: 7
-    downTextureIndex: 1
-    leftRightTextureIndex: 2
-  - name: Air
-    upTextureIndex: 7
-    downTextureIndex: 1
-    leftRightTextureIndex: 2
+  range: 16
 --- !u!1 &1940016070
 GameObject:
   m_ObjectHideFlags: 0

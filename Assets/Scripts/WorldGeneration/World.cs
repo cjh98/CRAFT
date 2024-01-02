@@ -21,18 +21,27 @@ public class World : MonoBehaviour
     private Queue<Vector2Int> chunksMeshesToGenerate = new Queue<Vector2Int>();
     private Queue<Vector2Int> chunksDataToGenerate = new Queue<Vector2Int>();
 
-    private int range = 16;
+    public int range;
 
     private bool isCreatingChunkMeshes;
     private bool isCreatingChunkData;
+
+    private Camera main;
 
     private void Awake()
     {
         instance = this;
     }
 
+    private void Start()
+    {
+        main = Camera.main;
+    }
+
     private void Update()
     {
+        
+
         UpdateWorld(range);
 
         if (chunksDataToGenerate.Count > 0 && !isCreatingChunkData)
@@ -43,7 +52,9 @@ public class World : MonoBehaviour
         if (chunksMeshesToGenerate.Count > 0 && !isCreatingChunkMeshes)
         {
             StartCoroutine("CreateChunkMeshes");
-        }   
+        }
+
+        StartCoroutine("DisableOrEnableChunks");
     }
 
     private IEnumerator CreateChunkMeshes()
@@ -78,6 +89,47 @@ public class World : MonoBehaviour
         }
 
         isCreatingChunkData = false;
+    }
+
+    private IEnumerator DisableOrEnableChunks()
+    {
+        //Vector2Int playerChunk = GetPlayerChunk();
+
+        //foreach (KeyValuePair<Vector2Int, GameObject> pair in chunkMeshList)
+        //{
+        //    float dist = (pair.Key-playerChunk).magnitude;
+
+        //    if (dist > range)
+        //    {
+        //        pair.Value.gameObject.SetActive(false);
+        //        chunkDataList[pair.Key].gameObject.SetActive(false);
+        //    }
+
+        //    if (dist < range && pair.Value.gameObject.activeSelf == false)
+        //    {
+        //        pair.Value.gameObject.SetActive(true);
+        //        chunkDataList[pair.Key].gameObject.SetActive(true);
+        //    }
+        //}
+
+        Plane[] planes = GeometryUtility.CalculateFrustumPlanes(main);
+
+        foreach (Vector2Int pos in chunkMeshList.Keys)
+        {
+            GameObject chunk = chunkMeshList[pos];
+            if (!GeometryUtility.TestPlanesAABB(planes, chunk.GetComponent<Renderer>().bounds))
+            {
+                chunk.gameObject.SetActive(false);
+                chunkDataList[pos].gameObject.SetActive(false);
+            }
+            else
+            {
+                chunk.gameObject.SetActive(true);
+                chunkDataList[pos].gameObject.SetActive(true);
+            }
+        }
+
+        yield return null;
     }
 
     private Vector2Int GetPlayerChunk()
