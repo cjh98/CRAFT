@@ -10,10 +10,10 @@ public class ChunkMesh : MonoBehaviour
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
 
-    readonly List<Vector3> vertices = new List<Vector3>();
-    readonly List<int> tris = new List<int>();
-    readonly List<Vector4> uvs = new List<Vector4>();
-    readonly List<Vector3> normals = new List<Vector3>();
+    private List<Vector3> vertices = new List<Vector3>();
+    private List<int> tris = new List<int>();
+    private List<Vector4> uvs = new List<Vector4>();
+    private List<Vector3> normals = new List<Vector3>();
 
     public BurstChunkData chunkData;
 
@@ -36,10 +36,22 @@ public class ChunkMesh : MonoBehaviour
         chunkData = data;
     }
 
+    private void ClearArrays()
+    {
+        vertices.Clear();
+        tris.Clear();
+        normals.Clear();
+        uvs.Clear();
+
+        vertexCount = 0;
+    }
+
     public void Init()
     {
         meshFilter = GetComponent<MeshFilter>();
         meshRenderer = GetComponent<MeshRenderer>();
+
+        ClearArrays();
 
         GenerateMesh();
         ApplyMesh();
@@ -85,7 +97,7 @@ public class ChunkMesh : MonoBehaviour
 
                         if (currentBlockOpaque == compareBlockOpaque)
                         {
-                            mask[n++] = new Mask(Utility.Blocks.Null, 0);
+                            mask[n++] = new Mask(Utility.Blocks.Air, 0);
                         }
                         else if (currentBlockOpaque)
                         {
@@ -147,7 +159,7 @@ public class ChunkMesh : MonoBehaviour
                             {
                                 for (int k = 0; k < width; k++)
                                 {
-                                    mask[n + k + l * axis1Limit] = new Mask(Utility.Blocks.Null, 0);
+                                    mask[n + k + l * axis1Limit] = new Mask(Utility.Blocks.Air, 0);
                                 }
                             }
 

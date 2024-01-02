@@ -85,6 +85,8 @@ public class World : MonoBehaviour
 
             data.Init();
 
+            data.finished = true;
+
             yield return null;
         }
 
@@ -93,25 +95,6 @@ public class World : MonoBehaviour
 
     private IEnumerator DisableOrEnableChunks()
     {
-        //Vector2Int playerChunk = GetPlayerChunk();
-
-        //foreach (KeyValuePair<Vector2Int, GameObject> pair in chunkMeshList)
-        //{
-        //    float dist = (pair.Key-playerChunk).magnitude;
-
-        //    if (dist > range)
-        //    {
-        //        pair.Value.gameObject.SetActive(false);
-        //        chunkDataList[pair.Key].gameObject.SetActive(false);
-        //    }
-
-        //    if (dist < range && pair.Value.gameObject.activeSelf == false)
-        //    {
-        //        pair.Value.gameObject.SetActive(true);
-        //        chunkDataList[pair.Key].gameObject.SetActive(true);
-        //    }
-        //}
-
         Plane[] planes = GeometryUtility.CalculateFrustumPlanes(main);
 
         foreach (Vector2Int pos in chunkMeshList.Keys)
@@ -135,6 +118,59 @@ public class World : MonoBehaviour
     private Vector2Int GetPlayerChunk()
     {
         return new Vector2Int(Mathf.FloorToInt(player.position.x / chunkDimensions.x), Mathf.FloorToInt(player.position.z / chunkDimensions.z));
+    }
+
+    public Vector2Int GetChunkAt(Vector3 pos)
+    {
+        return new Vector2Int(Mathf.FloorToInt(pos.x / chunkDimensions.x), Mathf.FloorToInt(pos.z / chunkDimensions.z));
+    }
+
+    public int WorldVector3ToChunkIndex(Vector3 pos)
+    {
+        Vector2Int chunkPos = GetChunkAt(pos);
+        BurstChunkData data = chunkDataList[chunkPos].GetComponent<BurstChunkData>();
+
+        Vector3Int posI = new Vector3Int(Mathf.FloorToInt(pos.x),
+            Mathf.FloorToInt(pos.y),
+            Mathf.FloorToInt(pos.z));
+
+        posI = new Vector3Int(posI.x - chunkPos.x * chunkDimensions.x, posI.y, posI.z - chunkPos.y * chunkDimensions.z);
+
+        return data.GetBlockIndex(posI.x, posI.y, posI.z);
+    }
+
+    public bool IsBlockAt(Vector3 pos)
+    {
+        Vector2Int chunkPos = GetChunkAt(pos);
+        BurstChunkData data = null; 
+
+        if (chunkMeshList.ContainsKey(chunkPos) && chunkDataList.ContainsKey(chunkPos))
+        {
+            data = chunkDataList[chunkPos].GetComponent<BurstChunkData>();
+
+            if (data.finished)
+            {
+                int index = WorldVector3ToChunkIndex(pos);
+
+                return data.blockMap[index] != Utility.Blocks.Air;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    public Utility.Blocks GetBlockAtVec3(Vector3 pos)
+    {
+        Vector2Int chunkPos = GetChunkAt(pos);
+        BurstChunkData data = chunkDataList[chunkPos].GetComponent<BurstChunkData>();
+
+        int index = WorldVector3ToChunkIndex(pos);
+
+        return data.blockMap[index];
     }
 
     private void UpdateWorld(int range)
@@ -171,5 +207,18 @@ public class World : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void EditChunkBlockmap(Vector3 pos, Utility.Blocks newBlock)
+    {
+        Vector2Int chunk = GetChunkAt(pos);
+
+        BurstChunkData data = chunkDataList[chunk].GetComponent<BurstChunkData>();
+        ChunkMesh mesh = chunkMeshList[chunk].GetComponent<ChunkMesh>();
+
+        int index = WorldVector3ToChunkIndex(pos);
+
+        data.blockMap[index] = newBlock;
+        chunksMeshesToGenerate.Enqueue(chunk);
     }
 }

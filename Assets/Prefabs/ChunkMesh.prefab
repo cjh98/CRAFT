@@ -97,3 +97,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: f66a21273ec76074a802bde6daa9fb60, type: 2}
+  chunkData: {fileID: 0}

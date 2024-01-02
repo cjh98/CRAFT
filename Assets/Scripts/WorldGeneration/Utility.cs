@@ -17,11 +17,6 @@ public static class Utility
     {
         Stone,
         Dirt,
-        Null,
-        PLACEHOLDER0,
-        PLACEHOLDER1,
-        PLACEHOLDER2,
-        PLACEHOLDER3,
         Grass,
         Air
     }

@@ -15,6 +15,8 @@ public class BurstChunkData : MonoBehaviour
     private NativeArray<float> noiseMap;
     public NativeArray<Utility.Blocks> blockMap;
 
+    public bool finished = false;
+
     public void Init()
     {
         noiseMap = new NativeArray<float>(width * height * depth, Allocator.Persistent);
