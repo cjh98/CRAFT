@@ -34,9 +34,9 @@ public class InterpolateChunkData : MonoBehaviour
             {
                 for (int x = 0; x < interpX; x++)
                 {
-                    float xf = x + 0.001f + chunkPosition.x;
-                    float yf = y + 0.001f;
-                    float zf = z + 0.001f + chunkPosition.y;
+                    float xf = x * xStep + 0.001f + chunkPosition.x;
+                    float yf = y * yStep + 0.001f;
+                    float zf = z * zStep + 0.001f + chunkPosition.y;
 
                     float sample = noise.pnoise(new float3(xf / Utility.NOISE_SCALE, yf / Utility.NOISE_SCALE, zf / Utility.NOISE_SCALE), float.MaxValue);
                     sample *= Utility.CHUNK_Y * Utility.DEFAULT_HEIGHT_OFFSET;
@@ -107,14 +107,18 @@ public class InterpolateChunkData : MonoBehaviour
         float normZ = Mathf.Clamp01(localPos.z / Utility.CHUNK_Z);
 
         // Convert normalized coordinates to chunk indices
-        int x0 = Mathf.FloorToInt(normX * (Utility.CHUNK_X / xStep) - 0.001f);
-        int y0 = Mathf.FloorToInt(normY * (Utility.CHUNK_Y / yStep) - 0.001f);
-        int z0 = Mathf.FloorToInt(normZ * (Utility.CHUNK_Z / zStep) - 0.001f);
+        int x0 = Mathf.FloorToInt(normX * (Utility.CHUNK_X / xStep));
+        int y0 = Mathf.FloorToInt(normY * (Utility.CHUNK_Y / yStep));
+        int z0 = Mathf.FloorToInt(normZ * (Utility.CHUNK_Z / zStep));
 
         // Calculate interpolation weights
-        float wX = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(1.0f - Mathf.Abs(2.0f * normX - 1.0f)));
-        float wY = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(1.0f - Mathf.Abs(2.0f * normY - 1.0f)));
-        float wZ = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(1.0f - Mathf.Abs(2.0f * normZ - 1.0f)));
+        //float wX = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(1.0f - Mathf.Abs(2.0f * normX - 1.0f)));
+        //float wY = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(1.0f - Mathf.Abs(2.0f * normY - 1.0f)));
+        //float wZ = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(1.0f - Mathf.Abs(2.0f * normZ - 1.0f)));
+
+        float wX = Mathf.SmoothStep(0f, 1f, 0.01f);
+        float wY = Mathf.SmoothStep(0f, 1f, 0.01f);
+        float wZ = Mathf.SmoothStep(0f, 1f, 0.01f);
 
         // Perform trilinear interpolation
         float sample000 = GetNoiseValue(x0, y0, z0);

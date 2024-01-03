@@ -958,6 +958,7 @@ MonoBehaviour:
   chunkDataPrefab: {fileID: 393607184177249191, guid: d3849665e948353449f7a3af43cc1268, type: 3}
   interpDataPrefab: {fileID: 8609306580637727453, guid: f447c4d5e9e56d841a745c547986bcab, type: 3}
   chunkMeshPrefab: {fileID: 2434145552892773456, guid: 2919c1487f5de49429faf7ab3b667bc3, type: 3}
+  interpolated: 0
   range: 8
 --- !u!114 &1793214721
 MonoBehaviour:

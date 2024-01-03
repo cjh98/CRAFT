@@ -58,12 +58,12 @@ public class Player : MonoBehaviour
 
         if (Input.GetButton("Jump"))
         {
-            transform.position += Vector3.up * moveSpeed * Time.deltaTime;
+            transform.position += moveSpeed * Time.deltaTime * Vector3.up;
         }
 
         if (Input.GetKey(KeyCode.LeftControl))
         {
-            transform.position -= Vector3.up * moveSpeed * Time.deltaTime;
+            transform.position -= moveSpeed * Time.deltaTime * Vector3.up;
         }
     }
 
