@@ -18,7 +18,8 @@ public static class Utility
         Stone,
         Dirt,
         Grass,
-        Air
+        Air,
+        Sand
     }
 }
 

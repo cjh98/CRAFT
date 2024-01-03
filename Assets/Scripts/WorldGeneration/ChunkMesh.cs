@@ -54,7 +54,13 @@ public class ChunkMesh : MonoBehaviour
 
         if (firstGen)
         {
-            WorldPopulator.PopulateWorld(chunkData.blockMap);
+            // temporary
+            Biome biome;
+            biome.surfaceBlock = Utility.Blocks.Sand;
+            biome.subSurfaceBlock = Utility.Blocks.Sand;
+
+
+            WorldPopulator.PopulateWorld(chunkData.blockMap, biome);
         }
 
         ClearArrays();
@@ -258,6 +264,7 @@ public class ChunkMesh : MonoBehaviour
         return m1.block == m2.block && m1.normal == m2.normal;
     }
 
+    // move this somewhere or something
     private int BlockToTexture(Utility.Blocks block, Vector3 face)
     {
         if (block == Utility.Blocks.Stone)
@@ -286,6 +293,10 @@ public class ChunkMesh : MonoBehaviour
             {
                 return 2;
             }
+        }
+        else if (block == Utility.Blocks.Sand)
+        {
+            return 10;
         }
         else
         {

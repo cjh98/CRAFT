@@ -102,7 +102,7 @@ public class BurstChunkData : MonoBehaviour
                 weight *= Utility.PERSISTENCE;
                 scale2 /= Utility.LACUNARITY;
             }
-            
+
             sample *= height * Utility.DEFAULT_HEIGHT_OFFSET;
 
             noiseMap[index] = sample;
