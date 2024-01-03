@@ -40,8 +40,6 @@ public class World : MonoBehaviour
 
     private void Update()
     {
-        
-
         UpdateWorld(range);
 
         if (chunksDataToGenerate.Count > 0 && !isCreatingChunkData)
@@ -66,7 +64,7 @@ public class World : MonoBehaviour
             Vector2Int index = chunksMeshesToGenerate.Dequeue();
             ChunkMesh mesh = chunkMeshList[index].GetComponent<ChunkMesh>();
 
-            mesh.Init();
+            mesh.Init(true);
 
             yield return null;
         }
@@ -148,10 +146,10 @@ public class World : MonoBehaviour
         {
             data = chunkDataList[chunkPos].GetComponent<BurstChunkData>();
 
-            if (data.finished)
-            {
-                int index = WorldVector3ToChunkIndex(pos);
+            int index = WorldVector3ToChunkIndex(pos);
 
+            if (index < data.blockMap.Length && data.finished)
+            {
                 return data.blockMap[index] != Utility.Blocks.Air;
             }
             else
@@ -219,6 +217,6 @@ public class World : MonoBehaviour
         int index = WorldVector3ToChunkIndex(pos);
 
         data.blockMap[index] = newBlock;
-        chunksMeshesToGenerate.Enqueue(chunk);
+        mesh.Init(false);
     }
 }

@@ -6,6 +6,8 @@ public class Player : MonoBehaviour
     public float rotationSpeed;
 
     float moveSpeed;
+
+    public float maxDist;
     public float walkSpeed;
     public float sprintSpeed;
 
@@ -43,13 +45,26 @@ public class Player : MonoBehaviour
             {
                 BreakBlock(floatPos);
             }
+
+            if (Input.GetButtonDown("Fire2"))
+            {
+                PlaceBlock(floatPos);
+            }
         }
         else
         {
             highlight.position = new Vector3(0, -1000, 0);
         }
 
+        if (Input.GetButton("Jump"))
+        {
+            transform.position += Vector3.up * moveSpeed * Time.deltaTime;
+        }
 
+        if (Input.GetKey(KeyCode.LeftControl))
+        {
+            transform.position -= Vector3.up * moveSpeed * Time.deltaTime;
+        }
     }
 
     void CameraMovement()
@@ -68,7 +83,6 @@ public class Player : MonoBehaviour
     {
         float point = 0.0f;
         float step = 0.1f;
-        float maxDist = 4.0f;
 
         Vector3 dir = camT.forward;
         Vector3 start = camT.position;
@@ -92,6 +106,18 @@ public class Player : MonoBehaviour
         if (World.instance.IsBlockAt(pos))
         {
             World.instance.EditChunkBlockmap(pos, Utility.Blocks.Air);
+        }
+    }
+
+    // TODO: FIX THIS
+    void PlaceBlock(Vector3 pos)
+    {
+        float scale = 0.1f;
+        Vector3 placePos = (pos - camT.forward * scale);
+
+        if (!World.instance.IsBlockAt(placePos))
+        {
+            World.instance.EditChunkBlockmap(placePos, Utility.Blocks.Stone);
         }
     }
 }

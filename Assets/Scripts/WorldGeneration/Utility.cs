@@ -2,7 +2,7 @@
 public static class Utility
 {
     public const float NOISE_SCALE = 50f;
-    public const float SQUASH_FACTOR = 8f;
+    public const float SQUASH_FACTOR = 4f;
     public const float DEFAULT_HEIGHT_OFFSET = 0.5f;
     public const uint OCTAVES = 2;
     public const float LACUNARITY = 2.0f;

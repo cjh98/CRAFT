@@ -15,7 +15,7 @@ public class BurstChunkData : MonoBehaviour
     private NativeArray<float> noiseMap;
     public NativeArray<Utility.Blocks> blockMap;
 
-    public bool finished = false;
+    public bool finished = true;
 
     public void Init()
     {
@@ -69,7 +69,7 @@ public class BurstChunkData : MonoBehaviour
             }
         }
 
-        void CreateWorld(int i)
+        void CreateWorldShape(int i)
         {
             // initial pass: solid vs air
             if (noiseMap[i] < 0)
@@ -79,18 +79,6 @@ public class BurstChunkData : MonoBehaviour
             else
             {
                 blockMap[i] = Utility.Blocks.Stone;
-            }
-
-            // grass
-            if (noiseMap[i] >= 0 && noiseMap[i] < 30)
-            {
-                blockMap[i] = Utility.Blocks.Grass; 
-            }
-
-            // dirt
-            if (noiseMap[i] >= 30 && noiseMap[i] < 60)
-            {
-                blockMap[i] = Utility.Blocks.Dirt;
             }
         }
 
@@ -120,7 +108,7 @@ public class BurstChunkData : MonoBehaviour
             noiseMap[index] = sample;
 
             Squash(index, y);
-            CreateWorld(index);
+            CreateWorldShape(index);
         }
     }
 

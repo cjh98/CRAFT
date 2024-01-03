@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Collections;
 using System.Collections.Generic;
 
 public class ChunkMesh : MonoBehaviour
@@ -46,10 +47,15 @@ public class ChunkMesh : MonoBehaviour
         vertexCount = 0;
     }
 
-    public void Init()
+    public void Init(bool firstGen)
     {
         meshFilter = GetComponent<MeshFilter>();
         meshRenderer = GetComponent<MeshRenderer>();
+
+        if (firstGen)
+        {
+            WorldPopulator.PopulateWorld(chunkData.blockMap);
+        }
 
         ClearArrays();
 
