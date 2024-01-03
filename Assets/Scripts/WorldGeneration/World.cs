@@ -13,6 +13,7 @@ public class World : MonoBehaviour
     public Vector3Int chunkDimensions;
 
     public GameObject chunkDataPrefab;
+    public GameObject interpDataPrefab;
     public GameObject chunkMeshPrefab;
 
     public Dictionary<Vector2Int, GameObject> chunkDataList = new Dictionary<Vector2Int, GameObject>();
@@ -81,6 +82,7 @@ public class World : MonoBehaviour
         {
             Vector2Int index = chunksDataToGenerate.Dequeue();
             BurstChunkData data = chunkDataList[index].GetComponent<BurstChunkData>();
+            //InterpolateChunkData data = chunkDataList[index].GetComponent<InterpolateChunkData>();
 
             data.Init();
 
@@ -130,6 +132,7 @@ public class World : MonoBehaviour
     {
         Vector2Int chunkPos = GetChunkAt(pos);
         BurstChunkData data = chunkDataList[chunkPos].GetComponent<BurstChunkData>();
+        //InterpolateChunkData data = chunkDataList[chunkPos].GetComponent<InterpolateChunkData>();
 
         Vector3Int posI = new Vector3Int(Mathf.FloorToInt(pos.x),
             Mathf.FloorToInt(pos.y),
@@ -202,6 +205,9 @@ public class World : MonoBehaviour
                     GameObject chunkData = Instantiate(chunkDataPrefab, new Vector3(x * chunkDimensions.x, 0, z * chunkDimensions.z), Quaternion.identity, transform);
                     chunkData.GetComponent<BurstChunkData>().position = new Vector2Int(x * chunkDimensions.x, z * chunkDimensions.z);
 
+                    //GameObject chunkData = Instantiate(interpDataPrefab, new Vector3(x * chunkDimensions.x, 0, z * chunkDimensions.z), Quaternion.identity, transform);
+                    //chunkData.GetComponent<InterpolateChunkData>().chunkPosition = new Vector2Int(x * chunkDimensions.x, z * chunkDimensions.z);
+
                     chunkDataList[pos] = chunkData;
                     chunksDataToGenerate.Enqueue(pos);
                 }
@@ -216,8 +222,7 @@ public class World : MonoBehaviour
                         ChunkMesh mesh = chunkMesh.GetComponent<ChunkMesh>();
 
                         BurstChunkData dataObject = chunkData.GetComponent<BurstChunkData>();
-
-                        dataObject.moisture = WorldPopulator.GenerateChunkMoistureValue(pos);
+                        //InterpolateChunkData dataObject = chunkData.GetComponent<InterpolateChunkData>();
 
                         mesh.SetChunkData(dataObject);
                         chunkMeshList[pos] = chunkMesh;

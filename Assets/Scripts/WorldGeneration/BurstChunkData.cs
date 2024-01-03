@@ -7,35 +7,29 @@ using UnityEngine;
 public class BurstChunkData : MonoBehaviour
 {
     public Vector2Int position;
-    private int width = Utility.CHUNK_X;
-    private int height = Utility.CHUNK_Y;
-    private int depth = Utility.CHUNK_Z;
-    private float scale = Utility.NOISE_SCALE;
 
     private NativeArray<float> noiseMap;
     public NativeArray<Utility.Blocks> blockMap;
 
     public bool finished = true;
 
-    public float moisture;
-
     public void Init()
     {
-        noiseMap = new NativeArray<float>(width * height * depth, Allocator.Persistent);
-        blockMap = new NativeArray<Utility.Blocks>(width * height * depth, Allocator.Persistent);
+        noiseMap = new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Y * Utility.CHUNK_Z, Allocator.Persistent);
+        blockMap = new NativeArray<Utility.Blocks>(Utility.CHUNK_X * Utility.CHUNK_Y * Utility.CHUNK_Z, Allocator.Persistent);
 
         PerlinNoiseJob job = new PerlinNoiseJob
         {
             position = position,
-            width = width,
-            height = height,
-            depth = depth,
-            scale = scale,
+            width = Utility.CHUNK_X,
+            height = Utility.CHUNK_Y,
+            depth = Utility.CHUNK_Z,
+            scale = Utility.NOISE_SCALE,
             noiseMap = noiseMap,
             blockMap = blockMap
         };
 
-        JobHandle jobHandle = job.Schedule(height * width * depth, 64);
+        JobHandle jobHandle = job.Schedule(Utility.CHUNK_Y * Utility.CHUNK_X * Utility.CHUNK_Z, 64);
         jobHandle.Complete();
     }
 

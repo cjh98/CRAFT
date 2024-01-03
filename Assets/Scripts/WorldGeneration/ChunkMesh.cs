@@ -1,5 +1,4 @@
 using UnityEngine;
-using Unity.Collections;
 using System.Collections.Generic;
 
 public class ChunkMesh : MonoBehaviour
@@ -17,6 +16,7 @@ public class ChunkMesh : MonoBehaviour
     private List<Vector3> normals = new List<Vector3>();
 
     public BurstChunkData chunkData;
+    //public InterpolateChunkData interpChunkData;
 
     private int vertexCount = 0;
 
@@ -36,6 +36,11 @@ public class ChunkMesh : MonoBehaviour
     {
         chunkData = data;
     }
+
+    //public void SetChunkData(InterpolateChunkData data)
+    //{
+    //    interpChunkData = data;
+    //}
 
     private void ClearArrays()
     {
@@ -97,6 +102,9 @@ public class ChunkMesh : MonoBehaviour
                     {
                         Utility.Blocks currentBlock = chunkData.GetBlock(chunkItr);
                         Utility.Blocks compareBlock = chunkData.GetBlock(chunkItr + axisMask);
+
+                        //Utility.Blocks currentBlock = interpChunkData.GetBlock(chunkItr);
+                        //Utility.Blocks compareBlock = interpChunkData.GetBlock(chunkItr + axisMask);
 
                         bool currentBlockOpaque = currentBlock != Utility.Blocks.Air;
                         bool compareBlockOpaque = compareBlock != Utility.Blocks.Air;

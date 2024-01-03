@@ -8,7 +8,12 @@ public class WorldPopulator
     {
         for (int i = 0; i < chunkData.blockMap.Length; i++)
         {
-            Biome biome = DetermineChunkBiome(chunkData);
+            //Biome biome = DetermineChunkBiome(chunkData);
+            Biome biome;
+
+            biome.name = "Test";
+            biome.surfaceBlock = Utility.Blocks.Sand;
+            biome.subSurfaceBlock = Utility.Blocks.Sand;
 
             SurfaceBlocks(i, chunkData.blockMap, biome);
             SubsurfaceBlocks(i, chunkData.blockMap, biome);
@@ -64,18 +69,16 @@ public class WorldPopulator
         return noise.pnoise(new float2(x / Utility.BIOME_SCALE, y / Utility.BIOME_SCALE), float.MaxValue);
     }
 
-    private static Biome DetermineChunkBiome(BurstChunkData data)
-    {
-        float moisture = data.moisture;
-
-        // desert
-        if (moisture < 0)
-        {
-            return Biomes.instance.biomes[1];
-        }
-        else
-        {
-            return Biomes.instance.biomes[0];
-        }
-    }
+    //private static Biome DetermineBlockBiome(BurstChunkData data)
+    //{
+    //    // desert
+    //    if (moisture < 0)
+    //    {
+    //        return Biomes.instance.biomes[1];
+    //    }
+    //    else
+    //    {
+    //        return Biomes.instance.biomes[0];
+    //    }
+    //}
 }

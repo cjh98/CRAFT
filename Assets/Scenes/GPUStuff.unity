@@ -955,7 +955,8 @@ MonoBehaviour:
   player: {fileID: 577491946}
   material: {fileID: 2100000, guid: f66a21273ec76074a802bde6daa9fb60, type: 2}
   chunkDimensions: {x: 16, y: 200, z: 16}
-  chunkDataPrefab: {fileID: 393607184177249191, guid: b6c191c97ae73c941946969be81af98b, type: 3}
+  chunkDataPrefab: {fileID: 393607184177249191, guid: d3849665e948353449f7a3af43cc1268, type: 3}
+  interpDataPrefab: {fileID: 8609306580637727453, guid: f447c4d5e9e56d841a745c547986bcab, type: 3}
   chunkMeshPrefab: {fileID: 2434145552892773456, guid: 2919c1487f5de49429faf7ab3b667bc3, type: 3}
   range: 8
 --- !u!114 &1793214721
