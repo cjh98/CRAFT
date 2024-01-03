@@ -916,6 +916,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1793214719}
   - component: {fileID: 1793214720}
+  - component: {fileID: 1793214721}
   m_Layer: 0
   m_Name: World
   m_TagString: Untagged
@@ -957,6 +958,25 @@ MonoBehaviour:
   chunkDataPrefab: {fileID: 393607184177249191, guid: b6c191c97ae73c941946969be81af98b, type: 3}
   chunkMeshPrefab: {fileID: 2434145552892773456, guid: 2919c1487f5de49429faf7ab3b667bc3, type: 3}
   range: 8
+--- !u!114 &1793214721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1793214718}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44c351987a6884c4f8c2da6148f0a94c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  biomes:
+  - name: Grassland
+    surfaceBlock: 2
+    subSurfaceBlock: 1
+  - name: Desert
+    surfaceBlock: 4
+    subSurfaceBlock: 4
 --- !u!1 &1940016070
 GameObject:
   m_ObjectHideFlags: 0

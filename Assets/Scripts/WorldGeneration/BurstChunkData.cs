@@ -17,6 +17,8 @@ public class BurstChunkData : MonoBehaviour
 
     public bool finished = true;
 
+    public float moisture;
+
     public void Init()
     {
         noiseMap = new NativeArray<float>(width * height * depth, Allocator.Persistent);

@@ -1,14 +1,17 @@
 using UnityEngine;
 using Unity.Collections;
+using Unity.Mathematics;
 
 public class WorldPopulator
 {
-    public static void PopulateWorld(NativeArray<Utility.Blocks> map, Biome biome)
+    public static void PopulateWorld(BurstChunkData chunkData)
     {
-        for (int i = 0; i < map.Length; i++)
+        for (int i = 0; i < chunkData.blockMap.Length; i++)
         {
-            SurfaceBlocks(i, map, biome);
-            SubsurfaceBlocks(i, map, biome);
+            Biome biome = DetermineChunkBiome(chunkData);
+
+            SurfaceBlocks(i, chunkData.blockMap, biome);
+            SubsurfaceBlocks(i, chunkData.blockMap, biome);
         }
     }
 
@@ -52,10 +55,27 @@ public class WorldPopulator
             }
         }
     }
-}
 
-public struct Biome
-{
-    public Utility.Blocks surfaceBlock;
-    public Utility.Blocks subSurfaceBlock;
+    public static float GenerateChunkMoistureValue(Vector2Int chunkPos)
+    {
+        float x = chunkPos.x + 0.001f;
+        float y = chunkPos.y + 0.001f;
+
+        return noise.pnoise(new float2(x / Utility.BIOME_SCALE, y / Utility.BIOME_SCALE), float.MaxValue);
+    }
+
+    private static Biome DetermineChunkBiome(BurstChunkData data)
+    {
+        float moisture = data.moisture;
+
+        // desert
+        if (moisture < 0)
+        {
+            return Biomes.instance.biomes[1];
+        }
+        else
+        {
+            return Biomes.instance.biomes[0];
+        }
+    }
 }

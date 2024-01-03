@@ -15,8 +15,8 @@ public class World : MonoBehaviour
     public GameObject chunkDataPrefab;
     public GameObject chunkMeshPrefab;
 
-    private Dictionary<Vector2Int, GameObject> chunkDataList = new Dictionary<Vector2Int, GameObject>();
-    private Dictionary<Vector2Int, GameObject> chunkMeshList = new Dictionary<Vector2Int, GameObject>();
+    public Dictionary<Vector2Int, GameObject> chunkDataList = new Dictionary<Vector2Int, GameObject>();
+    public Dictionary<Vector2Int, GameObject> chunkMeshList = new Dictionary<Vector2Int, GameObject>();
 
     private Queue<Vector2Int> chunksMeshesToGenerate = new Queue<Vector2Int>();
     private Queue<Vector2Int> chunksDataToGenerate = new Queue<Vector2Int>();
@@ -55,6 +55,7 @@ public class World : MonoBehaviour
         StartCoroutine("DisableOrEnableChunks");
     }
 
+    #region ASYNC
     private IEnumerator CreateChunkMeshes()
     {
         isCreatingChunkMeshes = true;
@@ -112,7 +113,9 @@ public class World : MonoBehaviour
 
         yield return null;
     }
+    #endregion
 
+    #region HELP
     private Vector2Int GetPlayerChunk()
     {
         return new Vector2Int(Mathf.FloorToInt(player.position.x / chunkDimensions.x), Mathf.FloorToInt(player.position.z / chunkDimensions.z));
@@ -170,6 +173,19 @@ public class World : MonoBehaviour
 
         return data.blockMap[index];
     }
+    public void EditChunkBlockmap(Vector3 pos, Utility.Blocks newBlock)
+    {
+        Vector2Int chunk = GetChunkAt(pos);
+
+        BurstChunkData data = chunkDataList[chunk].GetComponent<BurstChunkData>();
+        ChunkMesh mesh = chunkMeshList[chunk].GetComponent<ChunkMesh>();
+
+        int index = WorldVector3ToChunkIndex(pos);
+
+        data.blockMap[index] = newBlock;
+        mesh.Init(false);
+    }
+    #endregion
 
     private void UpdateWorld(int range)
     {
@@ -185,6 +201,7 @@ public class World : MonoBehaviour
                 {
                     GameObject chunkData = Instantiate(chunkDataPrefab, new Vector3(x * chunkDimensions.x, 0, z * chunkDimensions.z), Quaternion.identity, transform);
                     chunkData.GetComponent<BurstChunkData>().position = new Vector2Int(x * chunkDimensions.x, z * chunkDimensions.z);
+
                     chunkDataList[pos] = chunkData;
                     chunksDataToGenerate.Enqueue(pos);
                 }
@@ -198,25 +215,16 @@ public class World : MonoBehaviour
                     {
                         ChunkMesh mesh = chunkMesh.GetComponent<ChunkMesh>();
 
-                        mesh.SetChunkData(chunkData.GetComponent<BurstChunkData>());
+                        BurstChunkData dataObject = chunkData.GetComponent<BurstChunkData>();
+
+                        dataObject.moisture = WorldPopulator.GenerateChunkMoistureValue(pos);
+
+                        mesh.SetChunkData(dataObject);
                         chunkMeshList[pos] = chunkMesh;
                         chunksMeshesToGenerate.Enqueue(pos);
                     }
                 }
             }
         }
-    }
-
-    public void EditChunkBlockmap(Vector3 pos, Utility.Blocks newBlock)
-    {
-        Vector2Int chunk = GetChunkAt(pos);
-
-        BurstChunkData data = chunkDataList[chunk].GetComponent<BurstChunkData>();
-        ChunkMesh mesh = chunkMeshList[chunk].GetComponent<ChunkMesh>();
-
-        int index = WorldVector3ToChunkIndex(pos);
-
-        data.blockMap[index] = newBlock;
-        mesh.Init(false);
     }
 }

@@ -2,6 +2,7 @@
 public static class Utility
 {
     public const float NOISE_SCALE = 50f;
+    public const float BIOME_SCALE = 100f;
     public const float SQUASH_FACTOR = 4f;
     public const float DEFAULT_HEIGHT_OFFSET = 0.5f;
     public const uint OCTAVES = 2;
@@ -11,7 +12,6 @@ public static class Utility
     public const int CHUNK_X = 16;
     public const int CHUNK_Y = 200;
     public const int CHUNK_Z = 16;
-
 
     public enum Blocks
     {

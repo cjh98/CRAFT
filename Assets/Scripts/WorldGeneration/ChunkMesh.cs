@@ -54,13 +54,7 @@ public class ChunkMesh : MonoBehaviour
 
         if (firstGen)
         {
-            // temporary
-            Biome biome;
-            biome.surfaceBlock = Utility.Blocks.Sand;
-            biome.subSurfaceBlock = Utility.Blocks.Sand;
-
-
-            WorldPopulator.PopulateWorld(chunkData.blockMap, biome);
+            WorldPopulator.PopulateWorld(chunkData);
         }
 
         ClearArrays();
