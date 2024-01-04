@@ -8,8 +8,8 @@ public class BurstChunkData : MonoBehaviour
 {
     public Vector2Int position;
 
-    private NativeArray<float> noiseMap;
-    public NativeArray<Utility.Blocks> blockMap;
+    private NativeArray<float> DensityMap;
+    public NativeArray<Utility.Blocks> BlockMap;
 
     public bool finished = true;
 
@@ -17,24 +17,10 @@ public class BurstChunkData : MonoBehaviour
 
     public bool UseShader = false;
 
-    private void Awake()
-    {
-        wng = GetComponent<WorldNoiseGenerator>();
-
-        if (wng != null)
-        {
-            wng.Init();
-        }
-        else
-        {
-            Debug.LogError($"WorldNoiseGenerator at {position} is null");
-        }
-    }
-
     public void Init()
     {
-        noiseMap = new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Y * Utility.CHUNK_Z, Allocator.Persistent);
-        blockMap = new NativeArray<Utility.Blocks>(Utility.CHUNK_X * Utility.CHUNK_Y * Utility.CHUNK_Z, Allocator.Persistent);
+        DensityMap = new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Y * Utility.CHUNK_Z, Allocator.Persistent);
+        BlockMap = new NativeArray<Utility.Blocks>(Utility.CHUNK_X * Utility.CHUNK_Y * Utility.CHUNK_Z, Allocator.Persistent);
 
         PerlinNoiseJob job = new PerlinNoiseJob
         {
@@ -43,21 +29,34 @@ public class BurstChunkData : MonoBehaviour
             height = Utility.CHUNK_Y,
             depth = Utility.CHUNK_Z,
             scale = WorldNoiseSettings.NOISE_SCALE,
-            noiseMap = noiseMap,
-            blockMap = blockMap,
-            cont = wng.Continentalness,
-            ero = wng.Erosion,
-            pv = wng.Peaks
+            densityMap = DensityMap,
+            blockMap = BlockMap
         };
 
         JobHandle jobHandle = job.Schedule(Utility.CHUNK_Y * Utility.CHUNK_X * Utility.CHUNK_Z, 64);
         jobHandle.Complete();
+
+        wng = GetComponent<WorldNoiseGenerator>();
+        position = new Vector2Int(Mathf.FloorToInt(transform.position.x / Utility.CHUNK_X), Mathf.FloorToInt(transform.position.z / Utility.CHUNK_Z));
+
+        if (wng != null)
+        {
+            wng.Position = position;
+            wng.Init();
+        }
+        else
+        {
+            Debug.LogError($"WorldNoiseGenerator at {position} is null");
+            return;
+        }
+
+        FinalizeDensityMapWithWorldNoise();
     }
 
     void OnDestroy()
     {
-        noiseMap.Dispose();
-        blockMap.Dispose();
+        DensityMap.Dispose();
+        BlockMap.Dispose();
     }
 
     [BurstCompile]
@@ -68,39 +67,8 @@ public class BurstChunkData : MonoBehaviour
         public int height;
         public int depth;
         public float scale;
-        public NativeArray<float> noiseMap;
+        public NativeArray<float> densityMap;
         public NativeArray<Utility.Blocks> blockMap;
-        public NativeArray<float> cont;
-        public NativeArray<float> ero;
-        public NativeArray<float> pv;
-
-        void Squash(int i, int y)
-        {
-            int halfPoint = Mathf.FloorToInt(height * WorldNoiseSettings.DEFAULT_HEIGHT_OFFSET / 2);
-            int distFromHalfPoint = Mathf.Abs(y - halfPoint);
-
-            if (y < halfPoint)
-            {
-                noiseMap[i] = math.floor(noiseMap[i] + WorldNoiseSettings.SQUASH_FACTOR * distFromHalfPoint);
-            }
-            else if (y > halfPoint)
-            {
-                noiseMap[i] = math.floor(noiseMap[i] - WorldNoiseSettings.SQUASH_FACTOR * distFromHalfPoint);
-            }
-        }
-
-        void CreateWorldShape(int i)
-        {
-            // initial pass: solid vs air
-            if (noiseMap[i] < 0)
-            {
-                blockMap[i] = Utility.Blocks.Air;
-            }
-            else
-            {
-                blockMap[i] = Utility.Blocks.Stone;
-            }
-        }
 
         public void Execute(int index)
         {
@@ -116,25 +84,80 @@ public class BurstChunkData : MonoBehaviour
             float weight = 1.0f;
             float scale2 = 1.0f;
 
-            for (int i = 0; i < WorldNoiseSettings.OCTAVES; i++)
+            int octaves = WorldNoiseSettings.OCTAVES;
+            for (int i = 0; i < octaves - 1; i += 2)
             {
-                sample += noise.pnoise(new float3(xCoord / scale, yCoord / scale, zCoord / scale) / scale2, float.MaxValue) * weight;
-                weight *= WorldNoiseSettings.PERSISTENCE;
-                scale2 /= WorldNoiseSettings.LACUNARITY;
+                float3 coord1 = new float3(xCoord / scale, yCoord / scale, zCoord / scale) / scale2;
+                float3 coord2 = new float3(xCoord / scale, yCoord / scale, zCoord / scale) / scale2;
+
+                sample += noise.pnoise(coord1, float.MaxValue) * weight;
+                sample += noise.pnoise(coord2, float.MaxValue) * weight;
+                
+                weight *= WorldNoiseSettings.PERSISTENCE * WorldNoiseSettings.PERSISTENCE;
+                scale2 *= WorldNoiseSettings.LACUNARITY * WorldNoiseSettings.LACUNARITY;
             }
 
-            int twoDIndex = x * width + z;
+            // Handle the last iteration if OCTAVES is an odd number
+            if (octaves % 2 == 1)
+            {
+                float3 coord = new float3(xCoord / scale, yCoord / scale, zCoord / scale) / scale2;
+                sample += noise.pnoise(coord, float.MaxValue) * weight;
+            }
 
-            float cSample = cont[twoDIndex];
-            float eSample = ero[twoDIndex];
-            float pvSample = pv[twoDIndex];
+            densityMap[index] = sample * Utility.CHUNK_Y * WorldNoiseSettings.DEFAULT_HEIGHT_OFFSET;
+        }
+    }
 
-            sample *= (cSample + eSample + pvSample) * WorldNoiseSettings.DEFAULT_HEIGHT_OFFSET;
+    private void FinalizeDensityMapWithWorldNoise()
+    {
+        for (int z = 0; z < Utility.CHUNK_Z; z++)
+        {
+            for (int y = 0; y < Utility.CHUNK_Y; y++)
+            {
+                for (int x = 0; x < Utility.CHUNK_X; x++)
+                {
+                    int index2D = x * Utility.CHUNK_X + z;
+                    int index3D = z * Utility.CHUNK_X * Utility.CHUNK_Y + y * Utility.CHUNK_X + x;
 
-            noiseMap[index] = sample;
+                    float continentalness = wng.Continentalness[index2D];
+                    float erosion =         wng.Erosion[index2D];
+                    float peaks =           wng.Peaks[index2D];
 
-            Squash(index, y);
-            CreateWorldShape(index);
+                    float total = continentalness; //+ erosion + peaks;
+
+                    DensityMap[index3D] += total;
+
+                    Squash(index3D, y);
+                    CreateWorldShape(index3D);
+                }
+            }
+        }
+    }
+
+    private void Squash(int i, int y)
+    {
+        int halfPoint = Mathf.FloorToInt(Utility.CHUNK_Y * WorldNoiseSettings.DEFAULT_HEIGHT_OFFSET / 2);
+        int distFromHalfPoint = Mathf.Abs(y - halfPoint);
+
+        if (y < halfPoint)
+        {
+            DensityMap[i] = math.floor(DensityMap[i] + WorldNoiseSettings.SQUASH_FACTOR * distFromHalfPoint);
+        }
+        else if (y > halfPoint)
+        {
+            DensityMap[i] = math.floor(DensityMap[i] - WorldNoiseSettings.SQUASH_FACTOR * distFromHalfPoint);
+        }
+    }
+
+    private void CreateWorldShape(int i)
+    {
+        if (DensityMap[i] < 0)
+        {
+            BlockMap[i] = Utility.Blocks.Air;
+        }
+        else
+        {
+            BlockMap[i] = Utility.Blocks.Stone;
         }
     }
 
@@ -147,6 +170,6 @@ public class BurstChunkData : MonoBehaviour
     {
         if (index.x >= World.instance.chunkDimensions.x || index.y >= World.instance.chunkDimensions.y || index.z >= World.instance.chunkDimensions.z || index.x < 0 || index.y < 0 || index.z < 0)
             return Utility.Blocks.Air;
-        return blockMap[GetBlockIndex(index.x, index.y, index.z)];
+        return BlockMap[GetBlockIndex(index.x, index.y, index.z)];
     }
 }

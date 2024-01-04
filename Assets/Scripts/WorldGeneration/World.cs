@@ -37,35 +37,33 @@ public class World : MonoBehaviour
     private void Start()
     {
         main = Camera.main;
-        //Test();
     }
 
     #region TEST
-    private void Test()
-    {
-        Vector2Int pos = new(0, 0);
+    //private void Test()
+    //{
+    //    Vector2Int pos = new(0, 0);
 
-        GameObject chunkData = Instantiate(shaderDataPrefab, new Vector3(pos.x * chunkDimensions.x, 0, pos.y * chunkDimensions.z), Quaternion.identity, transform);
-        chunkData.GetComponent<ChunkShaderData>().position = new Vector2Int(pos.x * chunkDimensions.x, pos.y * chunkDimensions.z);
+    //    GameObject chunkData = Instantiate(shaderDataPrefab, new Vector3(pos.x * chunkDimensions.x, 0, pos.y * chunkDimensions.z), Quaternion.identity, transform);
+    //    chunkData.GetComponent<ChunkShaderData>().position = new Vector2Int(pos.x * chunkDimensions.x, pos.y * chunkDimensions.z);
 
-        chunkDataList[pos] = chunkData;
-        chunksDataToGenerate.Enqueue(pos);
+    //    chunkDataList[pos] = chunkData;
+    //    chunksDataToGenerate.Enqueue(pos);
 
-        GameObject chunkMesh = Instantiate(chunkMeshPrefab, new Vector3(pos.x * chunkDimensions.x, 0, pos.y * chunkDimensions.z), Quaternion.identity, transform);
+    //    GameObject chunkMesh = Instantiate(chunkMeshPrefab, new Vector3(pos.x * chunkDimensions.x, 0, pos.y * chunkDimensions.z), Quaternion.identity, transform);
 
-        ChunkMesh mesh = chunkMesh.GetComponent<ChunkMesh>();
+    //    ChunkMesh mesh = chunkMesh.GetComponent<ChunkMesh>();
 
-        //BurstChunkData dataObject = chunkData.GetComponent<BurstChunkData>();
-        ChunkShaderData dataObject = chunkData.GetComponent<ChunkShaderData>();
+    //    //BurstChunkData dataObject = chunkData.GetComponent<BurstChunkData>();
+    //    BurstChunkData dataObject = chunkData.GetComponent<BurstChunkData>();
 
-        mesh.SetChunkData(dataObject);
-        chunkMeshList[pos] = chunkMesh;
-        chunksMeshesToGenerate.Enqueue(pos);
+    //    mesh.SetChunkData(dataObject);
+    //    chunkMeshList[pos] = chunkMesh;
+    //    chunksMeshesToGenerate.Enqueue(pos);
 
-        dataObject.Init();
-        mesh.Init(true);
-
-    }
+    //    dataObject.Init();
+    //    mesh.Init(true);
+    //}
     #endregion
 
     private void Update()
@@ -110,7 +108,7 @@ public class World : MonoBehaviour
         while (chunksDataToGenerate.Count > 0)
         {
             Vector2Int index = chunksDataToGenerate.Dequeue();
-            ChunkShaderData data = chunkDataList[index].GetComponent<ChunkShaderData>();
+            BurstChunkData data = chunkDataList[index].GetComponent<BurstChunkData>();
 
             data.Init();
 
@@ -178,9 +176,9 @@ public class World : MonoBehaviour
             BurstChunkData data = chunkDataList[chunkPos].GetComponent<BurstChunkData>();
             int index = WorldVector3ToChunkIndex(pos);
 
-            if (index < data.blockMap.Length && data.finished)
+            if (index < data.BlockMap.Length && data.finished)
             {
-                return data.blockMap[index] != Utility.Blocks.Air;
+                return data.BlockMap[index] != Utility.Blocks.Air;
             }
             else
             {
@@ -198,7 +196,7 @@ public class World : MonoBehaviour
 
         int index = WorldVector3ToChunkIndex(pos);
 
-        return data.blockMap[index];
+        return data.BlockMap[index];
     }
     public void EditChunkBlockmap(Vector3 pos, Utility.Blocks newBlock)
     {
@@ -209,7 +207,7 @@ public class World : MonoBehaviour
 
         int index = WorldVector3ToChunkIndex(pos);
 
-        data.blockMap[index] = newBlock;
+        data.BlockMap[index] = newBlock;
         mesh.Init(false);
     }
     #endregion
@@ -239,8 +237,8 @@ public class World : MonoBehaviour
 
     void CreateChunkDatas(Vector2Int pos)
     {
-        GameObject chunkData = Instantiate(shaderDataPrefab, new Vector3(pos.x * chunkDimensions.x, 0, pos.y * chunkDimensions.z), Quaternion.identity, transform);
-        chunkData.GetComponent<ChunkShaderData>().position = new Vector2Int(pos.x * chunkDimensions.x, pos.y * chunkDimensions.z);
+        GameObject chunkData = Instantiate(chunkDataPrefab, new Vector3(pos.x * chunkDimensions.x, 0, pos.y * chunkDimensions.z), Quaternion.identity, transform);
+        chunkData.GetComponent<BurstChunkData>().position = new Vector2Int(pos.x * chunkDimensions.x, pos.y * chunkDimensions.z);
 
         chunkDataList[pos] = chunkData;
         chunksDataToGenerate.Enqueue(pos);
@@ -254,7 +252,7 @@ public class World : MonoBehaviour
         {
             ChunkMesh mesh = chunkMesh.GetComponent<ChunkMesh>();
 
-            ChunkShaderData dataObject = chunkData.GetComponent<ChunkShaderData>();
+            BurstChunkData dataObject = chunkData.GetComponent<BurstChunkData>();
 
             mesh.SetChunkData(dataObject);
             chunkMeshList[pos] = chunkMesh;

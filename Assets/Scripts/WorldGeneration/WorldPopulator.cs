@@ -1,9 +1,9 @@
+using Unity.Collections;
 using UnityEngine;
-using Unity.Mathematics;
 
 public class WorldPopulator
 {
-    public static void PopulateWorld(ChunkShaderData chunkData)
+    public static void PopulateWorld(BurstChunkData chunkData)
     {
         if (chunkData == null)
         {
@@ -11,21 +11,18 @@ public class WorldPopulator
             return;
         }
 
+        //Debug.Log(string.Join(", ", chunkData.wng.Continentalness));
+
         for (int i = 0; i < chunkData.BlockMap.Length; i++)
         {
-            //Biome biome = DetermineChunkBiome(chunkData);
-            Biome biome;
-
-            biome.name = "Test";
-            biome.surfaceBlock = Utility.Blocks.Sand;
-            biome.subSurfaceBlock = Utility.Blocks.Sand;
+            Biome biome = DetermineBlockBiome(i, chunkData);
 
             SurfaceBlocks(i, chunkData.BlockMap, biome);
             SubsurfaceBlocks(i, chunkData.BlockMap, biome);
         }
     }
 
-    private static void SurfaceBlocks(int i, Utility.Blocks[] map, Biome biome)
+    private static void SurfaceBlocks(int i, NativeArray<Utility.Blocks> map, Biome biome)
     {
         int upY = i + Utility.CHUNK_X;
         int downY = i - Utility.CHUNK_X;
@@ -40,7 +37,7 @@ public class WorldPopulator
         }
     }
 
-    private static void SubsurfaceBlocks(int i, Utility.Blocks[] map, Biome biome)
+    private static void SubsurfaceBlocks(int i, NativeArray<Utility.Blocks> map, Biome biome)
     {
         // place subsurface block like dirt, sandstone etc
         if (map[i] == biome.surfaceBlock)
@@ -66,24 +63,23 @@ public class WorldPopulator
         }
     }
 
-    //public static float GenerateChunkMoistureValue(Vector2Int chunkPos)
-    //{
-    //    float x = chunkPos.x + 0.001f;
-    //    float y = chunkPos.y + 0.001f;
+    private static Biome DetermineBlockBiome(int i, BurstChunkData data)
+    {
+        int z = i / (Utility.CHUNK_X * Utility.CHUNK_Y);
+        int y = (i % (Utility.CHUNK_X * Utility.CHUNK_Y)) / Utility.CHUNK_X;  
+        int x = (i % (Utility.CHUNK_X * Utility.CHUNK_Y)) % Utility.CHUNK_X;  
 
-    //    return noise.pnoise(new float2(x / WorldNoiseSettings.BIOME_SCALE, y / WorldNoiseSettings.BIOME_SCALE), float.MaxValue);
-    //}
+        int index2D = x + z * Utility.CHUNK_X;
 
-    //private static Biome DetermineBlockBiome(BurstChunkData data)
-    //{
-    //    // desert
-    //    if (moisture < 0)
-    //    {
-    //        return Biomes.instance.biomes[1];
-    //    }
-    //    else
-    //    {
-    //        return Biomes.instance.biomes[0];
-    //    }
-    //}
+        float continentalness = data.wng.Continentalness[index2D];
+
+        if (continentalness < 0)
+        {
+            return Biomes.instance.biomes[1];
+        }
+        else
+        {
+            return Biomes.instance.biomes[0];
+        }
+    }
 }

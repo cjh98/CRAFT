@@ -13,6 +13,7 @@ float offsetX;
 //float offsetY;
 float offsetZ;
 float seed;
+//float continentalness;
 
 float hash(float n)
 {
@@ -36,18 +37,28 @@ float noise(float3 x)
 [numthreads(8, 8, 8)]
 void CSMain3D(uint3 id : SV_DispatchThreadID)
 {
-    int octaves = 2;
+    int octaves = 2.0f;
     float scale = 50.0f;
     float lacunarity = 2.0f;
     float persistence = 0.5f;
 
-    float weight = 1;
-    float n = 0;
+    float weight = 1.0f;
+    float n = 0.0f;
     for (int octave = 0; octave < octaves; octave++)
     {
         n += noise(float3(id.x + offsetX, id.y, id.z + offsetZ) / scale) * weight;
         scale /= lacunarity;
         weight *= persistence;
+    }
+
+    float weightC = 1.0f;
+    float continentalness = 0.0f;
+    float continentalnessScale = 200.0f;
+    for (int octave = 0; octave < 2; octave++)
+    {
+        continentalness += (float3(id.x + offsetX, id.y + offsetZ, 0) / continentalnessScale) * weightC;
+        continentalnessScale /= lacunarity;
+        weightC *= persistence;
     }
 
     int index = id.x + width * (id.y + height * id.z);

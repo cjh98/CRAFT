@@ -5,12 +5,12 @@ RWStructuredBuffer<float> heightMap2D;
 int width;
 int height;
 float scale;
-float heightScale;
-float octaves;
-float lacunarity;
-float persistence;
+//float heightScale;
+//float octaves;
+//float lacunarity;
+//float persistence;
 float offsetX;
-float offsetY;
+float offsetZ;
 float seed;
 
 float hash(float n)
@@ -35,16 +35,21 @@ float noise(float3 x)
 [numthreads(8, 8, 1)]
 void CSMain2D(uint3 id : SV_DispatchThreadID)
 {
+    int octaves = 2;
+    float scale = 200.0f;
+    float lacunarity = 2.0f;
+    float persistence = 0.5f;
+
     float weight = 1;
     float n = 0;
     for (int octave = 0; octave < octaves; octave++)
     {
-        n += noise(float3(id.x + offsetX, id.y + offsetY, 0) / scale) * weight;
+        n += noise(float3(id.x + offsetX, 0, id.z + offsetZ) / scale) * weight;
         scale /= lacunarity;
         weight *= persistence;
     }
 
     int index = width * id.y + id.x;
 
-    heightMap2D[index] = n * heightScale;
+    heightMap2D[index] = n;
 }

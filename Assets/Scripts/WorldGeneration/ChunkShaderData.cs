@@ -16,14 +16,20 @@ public class ChunkShaderData : MonoBehaviour
 
     public Utility.Blocks[] BlockMap { get; private set; }
 
-    private float[] noiseMap;
+    public float[] DensityMap { get; private set; }
+    public float[] Continentalness { get; private set; }
 
-    private int size = Utility.CHUNK_X * Utility.CHUNK_Y * Utility.CHUNK_Z;
+    private int size3D = Utility.CHUNK_X * Utility.CHUNK_Y * Utility.CHUNK_Z;
+    private int size2D = Utility.CHUNK_X * Utility.CHUNK_Z;
+
+    private float seed = 69.0f;
 
     public void Init()
     {
-        noiseMap = new float[size];
-        BlockMap = new Utility.Blocks[size];
+        BlockMap = new Utility.Blocks[size3D];
+
+        DensityMap = new float[size3D];
+        Continentalness = new float[size2D];
 
         DispatchComputeShaders();
 
@@ -42,11 +48,15 @@ public class ChunkShaderData : MonoBehaviour
         //Shader2D.SetFloat("lacunarity", 2.0f);
         //Shader2D.SetFloat("persistence", 0.5f);
         //Shader2D.SetFloat("offsetX", position.x);
-        //Shader2D.SetFloat("offsetY", position.y);
+        //Shader2D.SetFloat("offsetZ", position.y);
         //Shader2D.SetFloat("seed", 69.0f);
 
-        //Shader2D.SetTexture(kernelHandle2D, "heightMap2D", renderTexture2D);
-        //Shader2D.Dispatch(kernelHandle2D, Utility.CHUNK_X / 8, Utility.CHUNK_Z / 8, 1);
+        //ComputeBuffer computeContinentalnessMap = new ComputeBuffer(size2D, sizeof(float));
+
+        //Shader2D.SetBuffer(kernelHandle2D, "heightMap2D", computeContinentalnessMap);
+        //Shader2D.Dispatch(kernelHandle2D, Utility.CHUNK_X / 8, Utility.CHUNK_Y / 8, 1);
+
+        //computeContinentalnessMap.GetData(Continentalness);
 
         // 3D
         Shader3D.SetInt("width", Utility.CHUNK_X);
@@ -54,14 +64,14 @@ public class ChunkShaderData : MonoBehaviour
         Shader3D.SetFloat("heightScale", Utility.CHUNK_Y / 2);
         Shader3D.SetFloat("offsetX", position.x);
         Shader3D.SetFloat("offsetZ", position.y);
-        Shader3D.SetFloat("seed", 69.0f);
+        Shader3D.SetFloat("seed", seed);
 
-        ComputeBuffer computeNoiseMap = new ComputeBuffer(size, sizeof(float));
+        ComputeBuffer computeNoiseMap = new ComputeBuffer(size3D, sizeof(float));
 
         Shader3D.SetBuffer(kernelHandle3D, "heightMap3D", computeNoiseMap);
         Shader3D.Dispatch(kernelHandle3D, Utility.CHUNK_X / 8, Utility.CHUNK_Y / 8, Utility.CHUNK_Z / 8);
 
-        computeNoiseMap.GetData(noiseMap);
+        computeNoiseMap.GetData(DensityMap);
     }
 
     public int GetBlockIndex(int x, int y, int z)
@@ -78,7 +88,7 @@ public class ChunkShaderData : MonoBehaviour
 
     private void CreateWorldShape()
     {
-        if (noiseMap.Length > 0)
+        if (DensityMap.Length > 0)
         {
             for (int z = 0; z < Utility.CHUNK_Z; z++)
             {
@@ -91,7 +101,7 @@ public class ChunkShaderData : MonoBehaviour
                         Squash(index, y);
 
                         // initial pass: solid vs air
-                        if (noiseMap[index] < 0)
+                        if (DensityMap[index] < 0)
                         {
                             BlockMap[index] = Utility.Blocks.Air;
                         }
@@ -117,11 +127,11 @@ public class ChunkShaderData : MonoBehaviour
 
         if (y < halfPoint)
         {
-            noiseMap[i] = Mathf.FloorToInt(noiseMap[i] + WorldNoiseSettings.SQUASH_FACTOR * distFromHalfPoint);
+            DensityMap[i] = Mathf.FloorToInt(DensityMap[i] + WorldNoiseSettings.SQUASH_FACTOR * distFromHalfPoint);
         }
         else if (y > halfPoint)
         {
-            noiseMap[i] = Mathf.FloorToInt(noiseMap[i] - WorldNoiseSettings.SQUASH_FACTOR * distFromHalfPoint);
+            DensityMap[i] = Mathf.FloorToInt(DensityMap[i] - WorldNoiseSettings.SQUASH_FACTOR * distFromHalfPoint);
         }
     }
 }

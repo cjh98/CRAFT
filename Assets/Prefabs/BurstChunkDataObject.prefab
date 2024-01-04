@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 393607184177249188}
   - component: {fileID: 393607184177249189}
-  - component: {fileID: -6202320576277944209}
+  - component: {fileID: 2614989022906646153}
   m_Layer: 0
   m_Name: BurstChunkDataObject
   m_TagString: Untagged
@@ -48,7 +48,8 @@ MonoBehaviour:
   position: {x: 0, y: 0}
   finished: 1
   wng: {fileID: 0}
---- !u!114 &-6202320576277944209
+  UseShader: 0
+--- !u!114 &2614989022906646153
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

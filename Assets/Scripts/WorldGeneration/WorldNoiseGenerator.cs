@@ -12,7 +12,7 @@ public class WorldNoiseGenerator : MonoBehaviour
     public NativeArray<float> Temperature { get; private set; }
     public NativeArray<float> Humidity { get; private set; }
 
-    public Vector2 Position { get; private set; }
+    public Vector2 Position;
 
     private void OnDestroy()
     {
@@ -25,51 +25,24 @@ public class WorldNoiseGenerator : MonoBehaviour
 
     public void Init()
     {
-        Continentalness = new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Z, Allocator.Persistent);
-        Erosion = new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Z, Allocator.Persistent);
-        Peaks = new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Z, Allocator.Persistent);
-        Temperature = new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Z, Allocator.Persistent);
-        Humidity = new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Z, Allocator.Persistent);
+        Continentalness =   new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Z, Allocator.Persistent);
+        Erosion =           new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Z, Allocator.Persistent);
+        Peaks =             new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Z, Allocator.Persistent);
+        Temperature =       new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Z, Allocator.Persistent);
+        Humidity =          new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Z, Allocator.Persistent);
 
         NoisesJob nj = new NoisesJob
         {
-            position = Position,
-            continentalness = Continentalness,
-            erosion = Erosion,
-            peaks = Peaks,
-            temperature = Temperature,
-            humidity = Humidity,
+            position =          Position,
+            continentalness =   Continentalness,
+            erosion =           Erosion,
+            peaks =             Peaks,
+            temperature =       Temperature,
+            humidity =          Humidity,
         };
 
-        JobHandle jh = nj.Schedule(Utility.CHUNK_X * Utility.CHUNK_Z, 16);
+        JobHandle jh = nj.Schedule(Utility.CHUNK_X * Utility.CHUNK_Z, 4);
         jh.Complete();
-    }
-
-    public float GetNoiseArrayValue(string name, Vector2Int pos)
-    {
-        int index = pos.x * Utility.CHUNK_X + pos.y;
-
-        switch (name)
-        {
-            case "Continentalness":
-                return Continentalness[index];
-
-            case "Erosion":
-                return Erosion[index];
-
-            case "Peaks/Valleys":
-                return Peaks[index];
-
-            case "Temperature":
-                return Temperature[index];
-
-            case "Humidity":
-                return Humidity[index];
-
-            default:
-                Debug.LogError("Invalid noise type!");
-                return -1000.0f;
-        }
     }
 
     [BurstCompile]
@@ -86,7 +59,7 @@ public class WorldNoiseGenerator : MonoBehaviour
         public void Execute(int index)
         {
             int x = index % Utility.CHUNK_X;
-            int z = index / Utility.CHUNK_Z;
+            int z = index / Utility.CHUNK_X;
 
             float xCoord = x + position.x + 0.001f;
             float zCoord = z + position.y + 0.001f;
