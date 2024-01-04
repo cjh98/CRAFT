@@ -15,7 +15,8 @@ public class ChunkMesh : MonoBehaviour
     private List<Vector4> uvs = new List<Vector4>();
     private List<Vector3> normals = new List<Vector3>();
 
-    private BurstChunkData chunkData;
+    //private BurstChunkData chunkData;
+    private ChunkShaderData chunkData;
 
     private int vertexCount = 0;
 
@@ -31,7 +32,12 @@ public class ChunkMesh : MonoBehaviour
         }
     }
 
-    public void SetChunkData(BurstChunkData data)
+    //public void SetChunkData(BurstChunkData data)
+    //{
+    //    chunkData = data;
+    //}
+
+    public void SetChunkData(ChunkShaderData data)
     {
         chunkData = data;
     }

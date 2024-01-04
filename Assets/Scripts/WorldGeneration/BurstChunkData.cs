@@ -13,6 +13,24 @@ public class BurstChunkData : MonoBehaviour
 
     public bool finished = true;
 
+    public WorldNoiseGenerator wng;
+
+    public bool UseShader = false;
+
+    private void Awake()
+    {
+        wng = GetComponent<WorldNoiseGenerator>();
+
+        if (wng != null)
+        {
+            wng.Init();
+        }
+        else
+        {
+            Debug.LogError($"WorldNoiseGenerator at {position} is null");
+        }
+    }
+
     public void Init()
     {
         noiseMap = new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Y * Utility.CHUNK_Z, Allocator.Persistent);
@@ -24,9 +42,12 @@ public class BurstChunkData : MonoBehaviour
             width = Utility.CHUNK_X,
             height = Utility.CHUNK_Y,
             depth = Utility.CHUNK_Z,
-            scale = Utility.NOISE_SCALE,
+            scale = WorldNoiseSettings.NOISE_SCALE,
             noiseMap = noiseMap,
-            blockMap = blockMap
+            blockMap = blockMap,
+            cont = wng.Continentalness,
+            ero = wng.Erosion,
+            pv = wng.Peaks
         };
 
         JobHandle jobHandle = job.Schedule(Utility.CHUNK_Y * Utility.CHUNK_X * Utility.CHUNK_Z, 64);
@@ -49,19 +70,22 @@ public class BurstChunkData : MonoBehaviour
         public float scale;
         public NativeArray<float> noiseMap;
         public NativeArray<Utility.Blocks> blockMap;
+        public NativeArray<float> cont;
+        public NativeArray<float> ero;
+        public NativeArray<float> pv;
 
         void Squash(int i, int y)
         {
-            int halfPoint = Mathf.FloorToInt(height * Utility.DEFAULT_HEIGHT_OFFSET / 2);
+            int halfPoint = Mathf.FloorToInt(height * WorldNoiseSettings.DEFAULT_HEIGHT_OFFSET / 2);
             int distFromHalfPoint = Mathf.Abs(y - halfPoint);
 
             if (y < halfPoint)
             {
-                noiseMap[i] = math.floor(noiseMap[i] + Utility.SQUASH_FACTOR * distFromHalfPoint);
+                noiseMap[i] = math.floor(noiseMap[i] + WorldNoiseSettings.SQUASH_FACTOR * distFromHalfPoint);
             }
             else if (y > halfPoint)
             {
-                noiseMap[i] = math.floor(noiseMap[i] - Utility.SQUASH_FACTOR * distFromHalfPoint);
+                noiseMap[i] = math.floor(noiseMap[i] - WorldNoiseSettings.SQUASH_FACTOR * distFromHalfPoint);
             }
         }
 
@@ -92,14 +116,20 @@ public class BurstChunkData : MonoBehaviour
             float weight = 1.0f;
             float scale2 = 1.0f;
 
-            for (int i = 0; i < Utility.OCTAVES; i++)
+            for (int i = 0; i < WorldNoiseSettings.OCTAVES; i++)
             {
                 sample += noise.pnoise(new float3(xCoord / scale, yCoord / scale, zCoord / scale) / scale2, float.MaxValue) * weight;
-                weight *= Utility.PERSISTENCE;
-                scale2 /= Utility.LACUNARITY;
+                weight *= WorldNoiseSettings.PERSISTENCE;
+                scale2 /= WorldNoiseSettings.LACUNARITY;
             }
 
-            sample *= height * Utility.DEFAULT_HEIGHT_OFFSET;
+            int twoDIndex = x * width + z;
+
+            float cSample = cont[twoDIndex];
+            float eSample = ero[twoDIndex];
+            float pvSample = pv[twoDIndex];
+
+            sample *= (cSample + eSample + pvSample) * WorldNoiseSettings.DEFAULT_HEIGHT_OFFSET;
 
             noiseMap[index] = sample;
 

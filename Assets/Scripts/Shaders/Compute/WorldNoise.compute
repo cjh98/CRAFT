@@ -1,0 +1,50 @@
+#pragma kernel CSMain2D
+
+RWStructuredBuffer<float> heightMap2D;
+
+int width;
+int height;
+float scale;
+float heightScale;
+float octaves;
+float lacunarity;
+float persistence;
+float offsetX;
+float offsetY;
+float seed;
+
+float hash(float n)
+{
+    return frac(sin(n) * 43758.5453);
+}
+
+float noise(float3 x)
+{
+    float3 p = floor(x);
+    float3 f = frac(x);
+
+    f = f * f * (3.0 - 2.0 * f);
+    float n = p.x + p.y * 57.0 + 113.0 * p.z;
+
+    return lerp(lerp(lerp(hash(n + 0.0), hash(n + 1.0), f.x),
+        lerp(hash(n + 57.0), hash(n + 58.0), f.x), f.y),
+        lerp(lerp(hash(n + 113.0), hash(n + 114.0), f.x),
+            lerp(hash(n + 170.0), hash(n + 171.0), f.x), f.y), f.z);
+}
+
+[numthreads(8, 8, 1)]
+void CSMain2D(uint3 id : SV_DispatchThreadID)
+{
+    float weight = 1;
+    float n = 0;
+    for (int octave = 0; octave < octaves; octave++)
+    {
+        n += noise(float3(id.x + offsetX, id.y + offsetY, 0) / scale) * weight;
+        scale /= lacunarity;
+        weight *= persistence;
+    }
+
+    int index = width * id.y + id.x;
+
+    heightMap2D[index] = n * heightScale;
+}

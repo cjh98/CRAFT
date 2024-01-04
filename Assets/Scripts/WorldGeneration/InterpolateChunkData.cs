@@ -38,8 +38,8 @@ public class InterpolateChunkData : MonoBehaviour
                     float yf = y * yStep + 0.001f;
                     float zf = z * zStep + 0.001f + chunkPosition.y;
 
-                    float sample = noise.pnoise(new float3(xf / Utility.NOISE_SCALE, yf / Utility.NOISE_SCALE, zf / Utility.NOISE_SCALE), float.MaxValue);
-                    sample *= Utility.CHUNK_Y * Utility.DEFAULT_HEIGHT_OFFSET;
+                    float sample = noise.pnoise(new float3(xf / WorldNoiseSettings.NOISE_SCALE, yf / WorldNoiseSettings.NOISE_SCALE, zf / WorldNoiseSettings.NOISE_SCALE), float.MaxValue);
+                    sample *= Utility.CHUNK_Y * WorldNoiseSettings.DEFAULT_HEIGHT_OFFSET;
 
                     int i = z * (interpX) * (interpY) + y * (interpX) + x;
 
@@ -68,16 +68,16 @@ public class InterpolateChunkData : MonoBehaviour
     {
         int y = i % ((Utility.CHUNK_X / xStep) * (Utility.CHUNK_Y / yStep)) / (Utility.CHUNK_Z / zStep);
 
-        int halfPoint = Mathf.FloorToInt(Utility.CHUNK_Y * Utility.DEFAULT_HEIGHT_OFFSET / 2);
+        int halfPoint = Mathf.FloorToInt(Utility.CHUNK_Y * WorldNoiseSettings.DEFAULT_HEIGHT_OFFSET / 2);
         int distFromHalfPoint = Mathf.Abs(y - halfPoint);
 
         if (y < halfPoint)
         {
-            noiseMap[i] = math.floor(noiseMap[i] + Utility.SQUASH_FACTOR * distFromHalfPoint);
+            noiseMap[i] = math.floor(noiseMap[i] + WorldNoiseSettings.SQUASH_FACTOR * distFromHalfPoint);
         }
         else if (y > halfPoint)
         {
-            noiseMap[i] = math.floor(noiseMap[i] - Utility.SQUASH_FACTOR * distFromHalfPoint);
+            noiseMap[i] = math.floor(noiseMap[i] - WorldNoiseSettings.SQUASH_FACTOR * distFromHalfPoint);
         }
     }
 
