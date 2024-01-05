@@ -13,9 +13,9 @@ public class WorldNoiseSettings : MonoBehaviour
     }
 
     public const float NOISE_SCALE = 50.0f;
-    public const float SQUASH_FACTOR = 1.0f;
+    public const float SQUASH_FACTOR = 6.0f;
     public const float DEFAULT_HEIGHT_OFFSET = 0.5f;
-    public const int OCTAVES = 8;
+    public const int OCTAVES = 4;
     public const float LACUNARITY = 2.0f;
     public const float PERSISTENCE = 0.5f;
 

@@ -15,7 +15,12 @@ public class WorldPopulator
 
         for (int i = 0; i < chunkData.BlockMap.Length; i++)
         {
-            Biome biome = DetermineBlockBiome(i, chunkData);
+            Biome biome;
+
+            biome.name = "poop";
+            biome.surfaceBlock = Utility.Blocks.Grass;
+            biome.subSurfaceBlock = Utility.Blocks.Dirt;
+            biome.squashFactor = 1.0f;
 
             SurfaceBlocks(i, chunkData.BlockMap, biome);
             SubsurfaceBlocks(i, chunkData.BlockMap, biome);
@@ -63,24 +68,24 @@ public class WorldPopulator
         }
     }
 
-    public static Biome DetermineBlockBiome(int i, BurstChunkData data)
-    {
-        int z = i / (Utility.CHUNK_X * Utility.CHUNK_Y);
-        int y = i % (Utility.CHUNK_X * Utility.CHUNK_Y) / Utility.CHUNK_X;  
-        int x = i % (Utility.CHUNK_X * Utility.CHUNK_Y) % Utility.CHUNK_X;  
+    //public static Biome DetermineBlockBiome(int i, BurstChunkData data)
+    //{
+    //    int z = i / (Utility.CHUNK_X * Utility.CHUNK_Y);
+    //    int y = i % (Utility.CHUNK_X * Utility.CHUNK_Y) / Utility.CHUNK_X;  
+    //    int x = i % (Utility.CHUNK_X * Utility.CHUNK_Y) % Utility.CHUNK_X;  
 
-        int index2D = x + z * Utility.CHUNK_X;
+    //    int index2D = x + z * Utility.CHUNK_X;
 
-        float continentalness = data.wng.Continentalness[index2D];
-        float erosion = data.wng.Erosion[index2D];
+    //    float continentalness = data.wng.Continentalness[index2D];
+    //    float erosion = data.wng.Erosion[index2D];
 
-        if (continentalness < 0 && erosion < 0)
-        {
-            return Biomes.instance.biomes[1];
-        }
-        else
-        {
-            return Biomes.instance.biomes[0];
-        }
-    }
+    //    if (continentalness < 0 && erosion < 0)
+    //    {
+    //        return Biomes.instance.biomes[1];
+    //    }
+    //    else
+    //    {
+    //        return Biomes.instance.biomes[0];
+    //    }
+    //}
 }

@@ -260,7 +260,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 70
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -1028,7 +1028,6 @@ GameObject:
   - component: {fileID: 1793214719}
   - component: {fileID: 1793214720}
   - component: {fileID: 1793214721}
-  - component: {fileID: 1793214722}
   m_Layer: 0
   m_Name: World
   m_TagString: Untagged
@@ -1066,11 +1065,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 577491946}
   material: {fileID: 2100000, guid: f66a21273ec76074a802bde6daa9fb60, type: 2}
-  chunkDimensions: {x: 16, y: 128, z: 16}
+  chunkDimensions: {x: 16, y: 200, z: 16}
   chunkDataPrefab: {fileID: 393607184177249191, guid: d3849665e948353449f7a3af43cc1268, type: 3}
   shaderDataPrefab: {fileID: 2184834361984301469, guid: 48c219ccdfe93754c969140883db82ae, type: 3}
   chunkMeshPrefab: {fileID: 2434145552892773456, guid: 2919c1487f5de49429faf7ab3b667bc3, type: 3}
-  range: 8
+  range: 16
 --- !u!114 &1793214721
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1092,66 +1091,6 @@ MonoBehaviour:
     surfaceBlock: 4
     subSurfaceBlock: 4
     squashFactor: 10
---- !u!114 &1793214722
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1793214718}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e7b6803283dd81f4891ae75eb13dd8b0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ContinentalnessCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: -0.9983694
-      value: 1
-      inSlope: 56.75387
-      outSlope: 56.75387
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: -0.36643845
-      value: 36.864525
-      inSlope: 20.392838
-      outSlope: 20.392838
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.34063733
-      value: 22.089907
-      inSlope: -12.228576
-      outSlope: -12.228576
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1.0032098
-      value: 39.8824
-      inSlope: 331.22366
-      outSlope: 331.22366
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.17967582
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  ErosionCurve:
-    serializedVersion: 2
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!1 &1940016070
 GameObject:
   m_ObjectHideFlags: 0

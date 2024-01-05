@@ -13,8 +13,6 @@ public class BurstChunkData : MonoBehaviour
 
     public bool finished = true;
 
-    public WorldNoiseGenerator wng;
-
     public void Init()
     {
         DensityMap = new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Y * Utility.CHUNK_Z, Allocator.Persistent);
@@ -34,21 +32,7 @@ public class BurstChunkData : MonoBehaviour
         JobHandle jobHandle = job.Schedule(Utility.CHUNK_Y * Utility.CHUNK_X * Utility.CHUNK_Z, 64);
         jobHandle.Complete();
 
-        wng = GetComponent<WorldNoiseGenerator>();
         position = new Vector2Int(Mathf.FloorToInt(transform.position.x / Utility.CHUNK_X), Mathf.FloorToInt(transform.position.z / Utility.CHUNK_Z));
-
-        if (wng != null)
-        {
-            wng.Position = position;
-            wng.Init();
-        }
-        else
-        {
-            Debug.LogError($"WorldNoiseGenerator at {position} is null");
-            return;
-        }
-
-        FinalizeDensityMapWithWorldNoise();
     }
 
     void OnDestroy()
@@ -67,6 +51,33 @@ public class BurstChunkData : MonoBehaviour
         public float scale;
         public NativeArray<float> densityMap;
         public NativeArray<Utility.Blocks> blockMap;
+
+        private void Squash(int i, int y)
+        {
+            int halfPoint = Mathf.FloorToInt(Utility.CHUNK_Y * WorldNoiseSettings.DEFAULT_HEIGHT_OFFSET / 2);
+            int distFromHalfPoint = Mathf.Abs(y - halfPoint);
+
+            if (y < halfPoint)
+            {
+                densityMap[i] = math.floor(densityMap[i] + WorldNoiseSettings.SQUASH_FACTOR * distFromHalfPoint);
+            }
+            else if (y > halfPoint)
+            {
+                densityMap[i] = math.floor(densityMap[i] - WorldNoiseSettings.SQUASH_FACTOR * distFromHalfPoint);
+            }
+        }
+
+        private void CreateWorldShape(int i)
+        {
+            if (densityMap[i] < 0)
+            {
+                blockMap[i] = Utility.Blocks.Air;
+            }
+            else
+            {
+                blockMap[i] = Utility.Blocks.Stone;
+            }
+        }
 
         public void Execute(int index)
         {
@@ -103,78 +114,21 @@ public class BurstChunkData : MonoBehaviour
             }
 
             densityMap[index] = sample * Utility.CHUNK_Y * WorldNoiseSettings.DEFAULT_HEIGHT_OFFSET;
+
+            Squash(index, y);
+            CreateWorldShape(index);
         }
     }
 
-    private void FinalizeDensityMapWithWorldNoise()
-    {
-        for (int z = 0; z < Utility.CHUNK_Z; z++)
-        {
-            for (int y = 0; y < Utility.CHUNK_Y; y++)
-            {
-                for (int x = 0; x < Utility.CHUNK_X; x++)
-                {
-                    int index2D = x + z;
-                    int index3D = GetBlockIndex(x, y, z);
-
-                    //print(index3D);
-
-                    float continentalness = wng.Continentalness[index2D];
-                    float erosion =         wng.Erosion[index2D];
-                    //float peaks =           wng.Peaks[index2D];
-
-                    float lerpFactor = 0.1f;
-
-                    float finalValue = Mathf.Lerp(continentalness, erosion, lerpFactor);
-
-                    DensityMap[index3D] = Mathf.Lerp(DensityMap[index3D], finalValue, lerpFactor);
-
-                    Squash(index3D, y);
-                    CreateWorldShape(index3D);
-                }
-            }
-        }
-    }
-
-    private void Squash(int i, int y)
-    {
-        int halfPoint = Mathf.FloorToInt(Utility.CHUNK_Y * WorldNoiseSettings.DEFAULT_HEIGHT_OFFSET / 2);
-        int distFromHalfPoint = Mathf.Abs(y - halfPoint);
-
-        Biome b = WorldPopulator.DetermineBlockBiome(i, this);
-
-        float squashValue = b.squashFactor * distFromHalfPoint;
-
-        if (y < halfPoint)
-        {
-            DensityMap[i] += squashValue;
-        }
-        else if (y > halfPoint)
-        {
-            DensityMap[i] -= squashValue;
-        }
-    }
-
-    private void CreateWorldShape(int i)
-    {
-        if (DensityMap[i] < 0)
-        {
-            BlockMap[i] = Utility.Blocks.Air;
-        }
-        else
-        {
-            BlockMap[i] = Utility.Blocks.Stone;
-        }
-    }
 
     public int GetBlockIndex(int x, int y, int z)
     {
-        return z * World.instance.chunkDimensions.x * World.instance.chunkDimensions.y + y * World.instance.chunkDimensions.x + x;
+        return z * Utility.CHUNK_X * Utility.CHUNK_Y + y * Utility.CHUNK_X + x;
     }
 
     public Utility.Blocks GetBlock(Vector3Int index)
     {
-        if (index.x >= World.instance.chunkDimensions.x || index.y >= World.instance.chunkDimensions.y || index.z >= World.instance.chunkDimensions.z || index.x < 0 || index.y < 0 || index.z < 0)
+        if (index.x >= Utility.CHUNK_X || index.y >= Utility.CHUNK_Y || index.z >= Utility.CHUNK_Z || index.x < 0 || index.y < 0 || index.z < 0)
             return Utility.Blocks.Air;
         return BlockMap[GetBlockIndex(index.x, index.y, index.z)];
     }
