@@ -72,8 +72,9 @@ public class WorldPopulator
         int index2D = x + z * Utility.CHUNK_X;
 
         float continentalness = data.wng.Continentalness[index2D];
+        float erosion = data.wng.Erosion[index2D];
 
-        if (continentalness < 0)
+        if (continentalness < 0 && erosion < 0)
         {
             return Biomes.instance.biomes[1];
         }

@@ -120,22 +120,14 @@ public class BurstChunkData : MonoBehaviour
                     //print(index3D);
 
                     float continentalness = wng.Continentalness[index2D];
-                    //float erosion =         wng.Erosion[index2D];
+                    float erosion =         wng.Erosion[index2D];
                     //float peaks =           wng.Peaks[index2D];
 
-                    float continentalnessPower = WorldNoiseSettings.Instance.ContinentalnessCurve.Evaluate(continentalness);
+                    float lerpFactor = 0.1f;
 
-                    float total = continentalnessPower; //+ erosion + peaks;
+                    float finalValue = Mathf.Lerp(continentalness, erosion, lerpFactor);
 
-                    //DensityMap[index3D] += total;
-
-                    float lerpFactor = 0.5f;
-
-                    DensityMap[index3D] = Mathf.Lerp(DensityMap[index3D], total, lerpFactor);
-
-
-
-                    //print(string.Join(", ", DensityMap[index3D]));
+                    DensityMap[index3D] = Mathf.Lerp(DensityMap[index3D], finalValue, lerpFactor);
 
                     Squash(index3D, y);
                     CreateWorldShape(index3D);
@@ -151,15 +143,15 @@ public class BurstChunkData : MonoBehaviour
 
         Biome b = WorldPopulator.DetermineBlockBiome(i, this);
 
-        float squashValue = math.floor(b.squashFactor * distFromHalfPoint);
+        float squashValue = b.squashFactor * distFromHalfPoint;
 
         if (y < halfPoint)
         {
-            DensityMap[i] = Mathf.Lerp(DensityMap[i], squashValue, 0.5f);
+            DensityMap[i] += squashValue;
         }
         else if (y > halfPoint)
         {
-            DensityMap[i] = Mathf.Lerp(DensityMap[i], -squashValue, 0.5f);
+            DensityMap[i] -= squashValue;
         }
     }
 

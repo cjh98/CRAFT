@@ -64,17 +64,48 @@ public class WorldNoiseGenerator : MonoBehaviour
             float xCoord = (x + position.x * Utility.CHUNK_X); /// WorldNoiseSettings.CONT_SCALE;
             float zCoord = (z + position.y * Utility.CHUNK_Z); /// WorldNoiseSettings.CONT_SCALE;
 
-            float cSample = noise.pnoise(new float2(xCoord / WorldNoiseSettings.CONT_SCALE,     zCoord / WorldNoiseSettings.CONT_SCALE),    float.MaxValue);
-            //float eSample = noise.pnoise(new float2(xCoord / WorldNoiseSettings.ERO_SCALE,      zCoord / WorldNoiseSettings.ERO_SCALE),      float.MaxValue);
+            float cSample = GetNoiseValue(
+                xCoord, 
+                zCoord, 
+                WorldNoiseSettings.CONT_OCTAVES, 
+                WorldNoiseSettings.CONT_LACUNARITY, 
+                WorldNoiseSettings.CONT_PERSISTENCE, 
+                WorldNoiseSettings.CONT_SCALE
+                );
+
+            float eSample = GetNoiseValue(
+                xCoord,
+                zCoord, 
+                WorldNoiseSettings.ERO_OCTAVES,
+                WorldNoiseSettings.ERO_LACUNARITY,
+                WorldNoiseSettings.ERO_PERSISTENCE,
+                WorldNoiseSettings.ERO_SCALE
+                );
+
             //float pSample = noise.pnoise(new float2(xCoord / WorldNoiseSettings.P_V_SCALE,      zCoord / WorldNoiseSettings.P_V_SCALE),      float.MaxValue);
             //float tSample = noise.pnoise(new float2(xCoord / WorldNoiseSettings.TEMP_SCALE,     zCoord / WorldNoiseSettings.TEMP_SCALE),    float.MaxValue);
             //float hSample = noise.pnoise(new float2(xCoord / WorldNoiseSettings.HUMID_SCALE,    zCoord / WorldNoiseSettings.HUMID_SCALE),  float.MaxValue);
 
             continentalness[index] =    cSample;
-            //erosion[index] =            eSample;
+            erosion[index] =            eSample;
             //peaks[index] =              pSample;
             //temperature[index] =        tSample;
             //humidity[index] =           hSample;
+        }
+
+        private float GetNoiseValue(float xCoord, float zCoord, int octaves, float lacunarity, float persistence, float scale)
+        {
+            float weight = 1.0f;
+            float noiseValue = 0.0f;
+
+            for (int i = 0; i < octaves; i++)
+            {
+                noiseValue += noise.pnoise(new float2(xCoord / scale, zCoord / scale), float.MaxValue) * weight;
+                scale /= lacunarity;
+                weight *= persistence;
+            }
+
+            return noiseValue;
         }
     }
 }

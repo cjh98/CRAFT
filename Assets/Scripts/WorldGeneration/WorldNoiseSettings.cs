@@ -5,23 +5,29 @@ public class WorldNoiseSettings : MonoBehaviour
     public static WorldNoiseSettings Instance;
 
     public AnimationCurve ContinentalnessCurve;
+    public AnimationCurve ErosionCurve;
 
     private void Awake()
     {
         Instance = this;
     }
 
-    public const float NOISE_SCALE = 50f;
-    public const float SQUASH_FACTOR = 20f;
+    public const float NOISE_SCALE = 50.0f;
+    public const float SQUASH_FACTOR = 1.0f;
     public const float DEFAULT_HEIGHT_OFFSET = 0.5f;
-    public const int OCTAVES = 2;
+    public const int OCTAVES = 8;
     public const float LACUNARITY = 2.0f;
     public const float PERSISTENCE = 0.5f;
 
-    // noise scales
+    // continentalness noise parameters
     public const float CONT_SCALE = 50.0f;
-    public const float ERO_SCALE = 25.0f;
-    public const float P_V_SCALE = 20.0f;
-    public const float TEMP_SCALE = 75.0f;
-    public const float HUMID_SCALE = 30.0f;
+    public const int CONT_OCTAVES = 6;
+    public const float CONT_LACUNARITY = 1.5f;
+    public const float CONT_PERSISTENCE = 0.75f;
+
+    // erosion noise parameters
+    public const float ERO_SCALE = 200.0f;
+    public const int ERO_OCTAVES = 3;
+    public const float ERO_LACUNARITY = 3.0f;
+    public const float ERO_PERSISTENCE = 0.33f;
 }
