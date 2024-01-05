@@ -98,6 +98,8 @@ public class ChunkShaderData : MonoBehaviour
                     {
                         int index = x + Utility.CHUNK_X * (y + Utility.CHUNK_Y * z);
 
+                        //print(index);
+
                         Squash(index, y);
 
                         // initial pass: solid vs air

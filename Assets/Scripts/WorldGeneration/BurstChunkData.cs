@@ -15,8 +15,6 @@ public class BurstChunkData : MonoBehaviour
 
     public WorldNoiseGenerator wng;
 
-    public bool UseShader = false;
-
     public void Init()
     {
         DensityMap = new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Y * Utility.CHUNK_Z, Allocator.Persistent);
@@ -116,16 +114,28 @@ public class BurstChunkData : MonoBehaviour
             {
                 for (int x = 0; x < Utility.CHUNK_X; x++)
                 {
-                    int index2D = x * Utility.CHUNK_X + z;
-                    int index3D = z * Utility.CHUNK_X * Utility.CHUNK_Y + y * Utility.CHUNK_X + x;
+                    int index2D = x + z;
+                    int index3D = GetBlockIndex(x, y, z);
+
+                    //print(index3D);
 
                     float continentalness = wng.Continentalness[index2D];
-                    float erosion =         wng.Erosion[index2D];
-                    float peaks =           wng.Peaks[index2D];
+                    //float erosion =         wng.Erosion[index2D];
+                    //float peaks =           wng.Peaks[index2D];
 
-                    float total = continentalness; //+ erosion + peaks;
+                    float continentalnessPower = WorldNoiseSettings.Instance.ContinentalnessCurve.Evaluate(continentalness);
 
-                    DensityMap[index3D] += total;
+                    float total = continentalnessPower; //+ erosion + peaks;
+
+                    //DensityMap[index3D] += total;
+
+                    float lerpFactor = 0.5f;
+
+                    DensityMap[index3D] = Mathf.Lerp(DensityMap[index3D], total, lerpFactor);
+
+
+
+                    //print(string.Join(", ", DensityMap[index3D]));
 
                     Squash(index3D, y);
                     CreateWorldShape(index3D);
@@ -139,13 +149,17 @@ public class BurstChunkData : MonoBehaviour
         int halfPoint = Mathf.FloorToInt(Utility.CHUNK_Y * WorldNoiseSettings.DEFAULT_HEIGHT_OFFSET / 2);
         int distFromHalfPoint = Mathf.Abs(y - halfPoint);
 
+        Biome b = WorldPopulator.DetermineBlockBiome(i, this);
+
+        float squashValue = math.floor(b.squashFactor * distFromHalfPoint);
+
         if (y < halfPoint)
         {
-            DensityMap[i] = math.floor(DensityMap[i] + WorldNoiseSettings.SQUASH_FACTOR * distFromHalfPoint);
+            DensityMap[i] = Mathf.Lerp(DensityMap[i], squashValue, 0.5f);
         }
         else if (y > halfPoint)
         {
-            DensityMap[i] = math.floor(DensityMap[i] - WorldNoiseSettings.SQUASH_FACTOR * distFromHalfPoint);
+            DensityMap[i] = Mathf.Lerp(DensityMap[i], -squashValue, 0.5f);
         }
     }
 

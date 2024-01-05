@@ -59,22 +59,22 @@ public class WorldNoiseGenerator : MonoBehaviour
         public void Execute(int index)
         {
             int x = index % Utility.CHUNK_X;
-            int z = index / Utility.CHUNK_X;
+            int z = index / Utility.CHUNK_Z;
 
-            float xCoord = x + position.x + 0.001f;
-            float zCoord = z + position.y + 0.001f;
+            float xCoord = (x + position.x * Utility.CHUNK_X); /// WorldNoiseSettings.CONT_SCALE;
+            float zCoord = (z + position.y * Utility.CHUNK_Z); /// WorldNoiseSettings.CONT_SCALE;
 
             float cSample = noise.pnoise(new float2(xCoord / WorldNoiseSettings.CONT_SCALE,     zCoord / WorldNoiseSettings.CONT_SCALE),    float.MaxValue);
-            float eSample = noise.pnoise(new float2(xCoord / WorldNoiseSettings.ERO_SCALE,      zCoord / WorldNoiseSettings.ERO_SCALE),      float.MaxValue);
-            float pSample = noise.pnoise(new float2(xCoord / WorldNoiseSettings.P_V_SCALE,      zCoord / WorldNoiseSettings.P_V_SCALE),      float.MaxValue);
-            float tSample = noise.pnoise(new float2(xCoord / WorldNoiseSettings.TEMP_SCALE,     zCoord / WorldNoiseSettings.TEMP_SCALE),    float.MaxValue);
-            float hSample = noise.pnoise(new float2(xCoord / WorldNoiseSettings.HUMID_SCALE,    zCoord / WorldNoiseSettings.HUMID_SCALE),  float.MaxValue);
+            //float eSample = noise.pnoise(new float2(xCoord / WorldNoiseSettings.ERO_SCALE,      zCoord / WorldNoiseSettings.ERO_SCALE),      float.MaxValue);
+            //float pSample = noise.pnoise(new float2(xCoord / WorldNoiseSettings.P_V_SCALE,      zCoord / WorldNoiseSettings.P_V_SCALE),      float.MaxValue);
+            //float tSample = noise.pnoise(new float2(xCoord / WorldNoiseSettings.TEMP_SCALE,     zCoord / WorldNoiseSettings.TEMP_SCALE),    float.MaxValue);
+            //float hSample = noise.pnoise(new float2(xCoord / WorldNoiseSettings.HUMID_SCALE,    zCoord / WorldNoiseSettings.HUMID_SCALE),  float.MaxValue);
 
             continentalness[index] =    cSample;
-            erosion[index] =            eSample;
-            peaks[index] =              pSample;
-            temperature[index] =        tSample;
-            humidity[index] =           hSample;
+            //erosion[index] =            eSample;
+            //peaks[index] =              pSample;
+            //temperature[index] =        tSample;
+            //humidity[index] =           hSample;
         }
     }
 }

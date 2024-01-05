@@ -63,11 +63,11 @@ public class WorldPopulator
         }
     }
 
-    private static Biome DetermineBlockBiome(int i, BurstChunkData data)
+    public static Biome DetermineBlockBiome(int i, BurstChunkData data)
     {
         int z = i / (Utility.CHUNK_X * Utility.CHUNK_Y);
-        int y = (i % (Utility.CHUNK_X * Utility.CHUNK_Y)) / Utility.CHUNK_X;  
-        int x = (i % (Utility.CHUNK_X * Utility.CHUNK_Y)) % Utility.CHUNK_X;  
+        int y = i % (Utility.CHUNK_X * Utility.CHUNK_Y) / Utility.CHUNK_X;  
+        int x = i % (Utility.CHUNK_X * Utility.CHUNK_Y) % Utility.CHUNK_X;  
 
         int index2D = x + z * Utility.CHUNK_X;
 

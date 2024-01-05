@@ -19,4 +19,5 @@ public struct Biome
     public string name;
     public Utility.Blocks surfaceBlock;
     public Utility.Blocks subSurfaceBlock;
+    public float squashFactor;
 }

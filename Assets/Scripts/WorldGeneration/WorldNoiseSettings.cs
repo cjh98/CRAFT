@@ -1,8 +1,18 @@
+using UnityEngine;
 
-public static class WorldNoiseSettings
+public class WorldNoiseSettings : MonoBehaviour
 {
+    public static WorldNoiseSettings Instance;
+
+    public AnimationCurve ContinentalnessCurve;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     public const float NOISE_SCALE = 50f;
-    public const float SQUASH_FACTOR = 5f;
+    public const float SQUASH_FACTOR = 20f;
     public const float DEFAULT_HEIGHT_OFFSET = 0.5f;
     public const int OCTAVES = 2;
     public const float LACUNARITY = 2.0f;
