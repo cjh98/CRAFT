@@ -6,8 +6,8 @@ public class LoadingScreen : MonoBehaviour
 
     private void Start()
     {
-        time = World.instance.range;
-        //time = 1.0f;
+        //time = World.instance.range;
+        time = 1.0f;
     }
 
     private void Update()

@@ -64,6 +64,33 @@ public class World : MonoBehaviour
     //    dataObject.Init();
     //    mesh.Init(true);
     //}
+
+    // MOVE CHUNK OBJECT AND REGEN MESH
+    //private void TEST()
+    //{
+    //    Vector2Int pos = new Vector2Int(0, 0);
+
+    //    if (Input.GetKeyDown(KeyCode.Return))
+    //    {
+    //        CreateChunkDatas(pos);
+    //        CreateChunkMesh(pos);
+
+    //        StartCoroutine(nameof(CreateChunkData));
+    //        StartCoroutine(nameof(CreateChunkMeshes));
+    //    }
+
+    //    if (Input.GetKeyDown(KeyCode.Space))
+    //    {
+    //        CreateChunkDatas(new Vector2Int(pos.x, pos.y + 1));
+    //        StartCoroutine(nameof(CreateChunkData));
+
+    //        chunkMeshList[pos].transform.Translate(new Vector3(0, 0, chunkDimensions.z));
+
+    //        ChunkMesh mesh = chunkMeshList[pos].GetComponent<ChunkMesh>();
+    //        mesh.SetChunkData(chunkDataList[new Vector2Int(pos.x, pos.y + 1)].GetComponent<BurstChunkData>());
+    //        mesh.Init(true);
+    //    }
+    //}
     #endregion
 
     private void Update()
@@ -82,6 +109,8 @@ public class World : MonoBehaviour
 
         StartCoroutine(nameof(DisableOrEnableChunks));
     }
+
+
 
     #region ASYNC
     private IEnumerator CreateChunkMeshes()

@@ -945,7 +945,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1760791641
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1069,7 +1069,7 @@ MonoBehaviour:
   chunkDataPrefab: {fileID: 393607184177249191, guid: d3849665e948353449f7a3af43cc1268, type: 3}
   shaderDataPrefab: {fileID: 2184834361984301469, guid: 48c219ccdfe93754c969140883db82ae, type: 3}
   chunkMeshPrefab: {fileID: 2434145552892773456, guid: 2919c1487f5de49429faf7ab3b667bc3, type: 3}
-  range: 16
+  range: 12
 --- !u!114 &1793214721
 MonoBehaviour:
   m_ObjectHideFlags: 0
