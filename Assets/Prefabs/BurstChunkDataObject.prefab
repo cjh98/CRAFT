@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 393607184177249188}
   - component: {fileID: 393607184177249189}
-  - component: {fileID: 2614989022906646153}
   m_Layer: 0
   m_Name: BurstChunkDataObject
   m_TagString: Untagged
@@ -47,17 +46,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   position: {x: 0, y: 0}
   finished: 1
-  wng: {fileID: 0}
-  UseShader: 0
---- !u!114 &2614989022906646153
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 393607184177249191}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e929275869870a4fb469ec44ffec80e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

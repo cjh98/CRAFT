@@ -1,3 +1,4 @@
+using System;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Burst;
@@ -25,20 +26,20 @@ public class WorldNoiseGenerator : MonoBehaviour
 
     public void Init()
     {
-        Continentalness =   new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Z, Allocator.Persistent);
-        Erosion =           new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Z, Allocator.Persistent);
-        Peaks =             new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Z, Allocator.Persistent);
-        Temperature =       new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Z, Allocator.Persistent);
-        Humidity =          new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Z, Allocator.Persistent);
+        Continentalness = new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Z, Allocator.Persistent);
+        Erosion = new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Z, Allocator.Persistent);
+        Peaks = new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Z, Allocator.Persistent);
+        Temperature = new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Z, Allocator.Persistent);
+        Humidity = new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Z, Allocator.Persistent);
 
         NoisesJob nj = new NoisesJob
         {
-            position =          Position,
-            continentalness =   Continentalness,
-            erosion =           Erosion,
-            peaks =             Peaks,
-            temperature =       Temperature,
-            humidity =          Humidity,
+            position = Position,
+            continentalness = Continentalness,
+            erosion = Erosion,
+            peaks = Peaks,
+            temperature = Temperature,
+            humidity = Humidity,
         };
 
         JobHandle jh = nj.Schedule(Utility.CHUNK_X * Utility.CHUNK_Z, 4);
@@ -65,17 +66,17 @@ public class WorldNoiseGenerator : MonoBehaviour
             float zCoord = (z + position.y * Utility.CHUNK_Z); /// WorldNoiseSettings.CONT_SCALE;
 
             float cSample = GetNoiseValue(
-                xCoord, 
-                zCoord, 
-                WorldNoiseSettings.CONT_OCTAVES, 
-                WorldNoiseSettings.CONT_LACUNARITY, 
-                WorldNoiseSettings.CONT_PERSISTENCE, 
+                xCoord,
+                zCoord,
+                WorldNoiseSettings.CONT_OCTAVES,
+                WorldNoiseSettings.CONT_LACUNARITY,
+                WorldNoiseSettings.CONT_PERSISTENCE,
                 WorldNoiseSettings.CONT_SCALE
                 );
 
             float eSample = GetNoiseValue(
                 xCoord,
-                zCoord, 
+                zCoord,
                 WorldNoiseSettings.ERO_OCTAVES,
                 WorldNoiseSettings.ERO_LACUNARITY,
                 WorldNoiseSettings.ERO_PERSISTENCE,
@@ -86,8 +87,8 @@ public class WorldNoiseGenerator : MonoBehaviour
             //float tSample = noise.pnoise(new float2(xCoord / WorldNoiseSettings.TEMP_SCALE,     zCoord / WorldNoiseSettings.TEMP_SCALE),    float.MaxValue);
             //float hSample = noise.pnoise(new float2(xCoord / WorldNoiseSettings.HUMID_SCALE,    zCoord / WorldNoiseSettings.HUMID_SCALE),  float.MaxValue);
 
-            continentalness[index] =    cSample;
-            erosion[index] =            eSample;
+            continentalness[index] = cSample;
+            erosion[index] = eSample;
             //peaks[index] =              pSample;
             //temperature[index] =        tSample;
             //humidity[index] =           hSample;

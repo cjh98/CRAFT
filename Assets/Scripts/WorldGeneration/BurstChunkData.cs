@@ -6,9 +6,10 @@ using UnityEngine;
 
 public class BurstChunkData : MonoBehaviour
 {
+    private NativeArray<float> DensityMap;
+
     public Vector2Int position;
 
-    private NativeArray<float> DensityMap;
     public NativeArray<Utility.Blocks> BlockMap;
 
     public bool finished = true;
@@ -20,7 +21,7 @@ public class BurstChunkData : MonoBehaviour
 
         PerlinNoiseJob job = new PerlinNoiseJob
         {
-            position = position,
+            position = new Vector2Int((int)transform.position.x, (int)transform.position.z),
             width = Utility.CHUNK_X,
             height = Utility.CHUNK_Y,
             depth = Utility.CHUNK_Z,
@@ -52,71 +53,55 @@ public class BurstChunkData : MonoBehaviour
         public NativeArray<float> densityMap;
         public NativeArray<Utility.Blocks> blockMap;
 
-        private void Squash(int i, int y)
+        private void Squash(ref float density, int y)
         {
             int halfPoint = Mathf.FloorToInt(Utility.CHUNK_Y * WorldNoiseSettings.DEFAULT_HEIGHT_OFFSET / 2);
             int distFromHalfPoint = Mathf.Abs(y - halfPoint);
 
             if (y < halfPoint)
             {
-                densityMap[i] = math.floor(densityMap[i] + WorldNoiseSettings.SQUASH_FACTOR * distFromHalfPoint);
+                density = math.floor(density + WorldNoiseSettings.SQUASH_FACTOR * distFromHalfPoint);
             }
             else if (y > halfPoint)
             {
-                densityMap[i] = math.floor(densityMap[i] - WorldNoiseSettings.SQUASH_FACTOR * distFromHalfPoint);
+                density = math.floor(density - WorldNoiseSettings.SQUASH_FACTOR * distFromHalfPoint);
             }
         }
 
-        private void CreateWorldShape(int i)
+        private void CreateWorldShape(float density, int i)
         {
-            if (densityMap[i] < 0)
-            {
-                blockMap[i] = Utility.Blocks.Air;
-            }
-            else
-            {
-                blockMap[i] = Utility.Blocks.Stone;
-            }
+            blockMap[i] = density < 0 ? Utility.Blocks.Air : Utility.Blocks.Stone;
         }
 
         public void Execute(int index)
         {
             int z = index / (width * height);
-            int y = index % (width * height) / width;
-            int x = index % (width * height) % width;
+            int y = (index / width) % height;
+            int x = index % width;
 
-            float xCoord = ((float)x + position.x);
-            float yCoord = y;
-            float zCoord = ((float)z + position.y);
+            float xCoord = (x + position.x) / scale;
+            float yCoord = y / scale;
+            float zCoord = (z + position.y) / scale;
 
             float sample = 0.0f;
             float weight = 1.0f;
             float scale2 = 1.0f;
 
             int octaves = WorldNoiseSettings.OCTAVES;
-            for (int i = 0; i < octaves - 1; i += 2)
+            for (int i = 0; i < octaves; i++)
             {
-                float3 coord1 = new float3(xCoord / scale, yCoord / scale, zCoord / scale) / scale2;
-                float3 coord2 = new float3(xCoord / scale, yCoord / scale, zCoord / scale) / scale2;
+                float3 coord = new float3(xCoord / scale2, yCoord / scale2, zCoord / scale2);
 
-                sample += noise.pnoise(coord1, float.MaxValue) * weight;
-                sample += noise.pnoise(coord2, float.MaxValue) * weight;
-                
-                weight *= WorldNoiseSettings.PERSISTENCE * WorldNoiseSettings.PERSISTENCE;
-                scale2 *= WorldNoiseSettings.LACUNARITY * WorldNoiseSettings.LACUNARITY;
+                sample += noise.snoise(coord) * weight;
+                weight *= WorldNoiseSettings.PERSISTENCE;
+                scale2 *= WorldNoiseSettings.LACUNARITY;
             }
 
-            // Handle the last iteration if OCTAVES is an odd number
-            if (octaves % 2 == 1)
-            {
-                float3 coord = new float3(xCoord / scale, yCoord / scale, zCoord / scale) / scale2;
-                sample += noise.pnoise(coord, float.MaxValue) * weight;
-            }
+            float density = sample * Utility.CHUNK_Y * WorldNoiseSettings.DEFAULT_HEIGHT_OFFSET;
 
-            densityMap[index] = sample * Utility.CHUNK_Y * WorldNoiseSettings.DEFAULT_HEIGHT_OFFSET;
-
-            Squash(index, y);
-            CreateWorldShape(index);
+            Squash(ref density, y);
+            densityMap[index] = density;
+            CreateWorldShape(density, index);
         }
     }
 

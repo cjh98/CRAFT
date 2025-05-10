@@ -3,6 +3,14 @@ using UnityEngine;
 
 public class WorldPopulator
 {
+    private static readonly Biome DefaultBiome = new Biome
+    {
+        name = "default",
+        surfaceBlock = Utility.Blocks.Grass,
+        subSurfaceBlock = Utility.Blocks.Dirt,
+        squashFactor = 1.0f
+    };
+
     public static void PopulateWorld(BurstChunkData chunkData)
     {
         if (chunkData == null)
@@ -11,81 +19,46 @@ public class WorldPopulator
             return;
         }
 
-        //Debug.Log(string.Join(", ", chunkData.wng.Continentalness));
-
-        for (int i = 0; i < chunkData.BlockMap.Length; i++)
+        int chunkSize = Utility.CHUNK_X * Utility.CHUNK_Y * Utility.CHUNK_Z;
+        for (int i = 0; i < chunkSize; i++)
         {
-            Biome biome;
-
-            biome.name = "poop";
-            biome.surfaceBlock = Utility.Blocks.Grass;
-            biome.subSurfaceBlock = Utility.Blocks.Dirt;
-            biome.squashFactor = 1.0f;
-
-            SurfaceBlocks(i, chunkData.BlockMap, biome);
-            SubsurfaceBlocks(i, chunkData.BlockMap, biome);
+            int y = (i / Utility.CHUNK_X) % Utility.CHUNK_Y; // Extract Y coordinate
+            if (y < Utility.CHUNK_Y - 1)
+            {
+                PlaceSurfaceAndSubsurfaceBlocks(i, chunkData.BlockMap, DefaultBiome);
+            }
         }
     }
 
-    private static void SurfaceBlocks(int i, NativeArray<Utility.Blocks> map, Biome biome)
+    private static void PlaceSurfaceAndSubsurfaceBlocks(int i, NativeArray<Utility.Blocks> map, Biome biome)
     {
-        int upY = i + Utility.CHUNK_X;
-        int downY = i - Utility.CHUNK_X;
+        int chunkWidth = Utility.CHUNK_X;
+        int chunkHeight = Utility.CHUNK_Y;
 
-        // place surface block like grass, sand etc
-        if (downY > 0 && upY < map.Length)
+        //int x = i % chunkWidth;
+        int y = (i / chunkWidth) % chunkHeight;
+        //int z = i / (chunkWidth * chunkHeight);
+
+        int upY = i + chunkWidth;
+        int downY = i - chunkWidth;
+
+        if (y < chunkHeight - 1 && y > 0)
         {
+            // Place surface block
             if (map[upY] == Utility.Blocks.Air && map[downY] == Utility.Blocks.Stone)
             {
                 map[i] = biome.surfaceBlock;
+
+                // Place subsurface blocks
+                for (int d = 1; d <= 3; d++)
+                {
+                    int downIndex = i - d * chunkWidth;
+                    if (downIndex >= 0)
+                    {
+                        map[downIndex] = biome.subSurfaceBlock;
+                    }
+                }
             }
         }
     }
-
-    private static void SubsurfaceBlocks(int i, NativeArray<Utility.Blocks> map, Biome biome)
-    {
-        // place subsurface block like dirt, sandstone etc
-        if (map[i] == biome.surfaceBlock)
-        {
-            int down1 = i - Utility.CHUNK_X;
-            int down2 = i - Utility.CHUNK_X * 2;
-            int down3 = i - Utility.CHUNK_X * 3;
-
-            if (down1 > 0)
-            {
-                map[down1] = biome.subSurfaceBlock;
-            }
-
-            if (down2 > 0)
-            {
-                map[down2] = biome.subSurfaceBlock;
-            }
-
-            if (down3 > 0)
-            {
-                map[down3] = biome.subSurfaceBlock;
-            }
-        }
-    }
-
-    //public static Biome DetermineBlockBiome(int i, BurstChunkData data)
-    //{
-    //    int z = i / (Utility.CHUNK_X * Utility.CHUNK_Y);
-    //    int y = i % (Utility.CHUNK_X * Utility.CHUNK_Y) / Utility.CHUNK_X;  
-    //    int x = i % (Utility.CHUNK_X * Utility.CHUNK_Y) % Utility.CHUNK_X;  
-
-    //    int index2D = x + z * Utility.CHUNK_X;
-
-    //    float continentalness = data.wng.Continentalness[index2D];
-    //    float erosion = data.wng.Erosion[index2D];
-
-    //    if (continentalness < 0 && erosion < 0)
-    //    {
-    //        return Biomes.instance.biomes[1];
-    //    }
-    //    else
-    //    {
-    //        return Biomes.instance.biomes[0];
-    //    }
-    //}
 }

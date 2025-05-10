@@ -5,20 +5,22 @@ public class ChunkMesh : MonoBehaviour
 {
     private Mesh mesh;
 
-    public Material material;
-
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
 
-    private List<Vector3> vertices = new List<Vector3>();
-    private List<int> tris = new List<int>();
-    private List<Vector4> uvs = new List<Vector4>();
-    private List<Vector3> normals = new List<Vector3>();
+    private readonly List<Vector3> vertices = new();
+    private readonly List<int> tris = new();
+    private readonly List<Vector4> uvs = new();
+    private readonly List<Vector3> normals = new();
 
     private BurstChunkData chunkData;
     //private ChunkShaderData chunkData;
 
     private int vertexCount = 0;
+
+    public Material material;
+
+    public Vector2Int newPos;
 
     public struct Mask
     {
@@ -31,11 +33,6 @@ public class ChunkMesh : MonoBehaviour
             normal = _normal;
         }
     }
-
-    //public void SetChunkData(BurstChunkData data)
-    //{
-    //    chunkData = data;
-    //}
 
     public void SetChunkData(BurstChunkData data)
     {

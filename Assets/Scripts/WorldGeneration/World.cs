@@ -95,14 +95,16 @@ public class World : MonoBehaviour
 
     private void Update()
     {
-        UpdateWorld(range);
+        UpdateWorld();
 
+        // Always make chunk data when player moves
         if (chunksDataToGenerate.Count > 0 && !isCreatingChunkData)
         {
             StartCoroutine(nameof(CreateChunkData));
         }
 
-        if (chunksMeshesToGenerate.Count > 0 && !isCreatingChunkMeshes)
+        // Make new meshes when not making new data
+        if (chunksMeshesToGenerate.Count > 0 && !isCreatingChunkMeshes && !isCreatingChunkData)
         {
             StartCoroutine(nameof(CreateChunkMeshes));
         }
@@ -241,7 +243,7 @@ public class World : MonoBehaviour
     }
     #endregion
 
-    private void UpdateWorld(int range)
+    private void UpdateWorld()
     {
         Vector2Int playerChunk = GetPlayerChunk();
 
