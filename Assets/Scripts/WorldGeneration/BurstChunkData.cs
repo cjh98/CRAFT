@@ -15,8 +15,9 @@ public class BurstChunkData : MonoBehaviour
 
     public void Init()
     {
-        DensityMap = new NativeArray<float>(Utility.CHUNK_X * Utility.CHUNK_Y * Utility.CHUNK_Z, Allocator.Persistent);
-        BlockMap = new NativeArray<Utility.Blocks>(Utility.CHUNK_X * Utility.CHUNK_Y * Utility.CHUNK_Z, Allocator.Persistent);
+        int totalSize = Utility.CHUNK_TOTAL_BLOCKS;
+        DensityMap = new NativeArray<float>(totalSize, Allocator.Persistent);
+        BlockMap = new NativeArray<Utility.Blocks>(totalSize, Allocator.Persistent);
 
         PerlinNoiseJob job = new PerlinNoiseJob
         {
@@ -29,7 +30,7 @@ public class BurstChunkData : MonoBehaviour
             blockMap = BlockMap
         };
 
-        JobHandle jobHandle = job.Schedule(Utility.CHUNK_Y * Utility.CHUNK_X * Utility.CHUNK_Z, 64);
+        JobHandle jobHandle = job.Schedule(totalSize, 64);
         jobHandle.Complete();
 
         position = new Vector2Int(Mathf.FloorToInt(transform.position.x / Utility.CHUNK_X), Mathf.FloorToInt(transform.position.z / Utility.CHUNK_Z));
@@ -88,9 +89,11 @@ public class BurstChunkData : MonoBehaviour
 
         public void Execute(int index)
         {
-            int z = index / (width * height);
-            int y = index % (width * height) / width;
-            int x = index % (width * height) % width;
+            int area = width * height;
+            int z = index / area;
+            int rem = index % area;
+            int y = rem / width;
+            int x = rem % width;
 
             float xCoord = ((float)x + position.x);
             float yCoord = y;

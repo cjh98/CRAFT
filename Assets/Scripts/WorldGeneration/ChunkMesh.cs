@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 using System.Collections.Generic;
 
 public class ChunkMesh : MonoBehaviour
@@ -6,7 +7,6 @@ public class ChunkMesh : MonoBehaviour
     private Mesh mesh;
 
     private MeshFilter meshFilter;
-    private MeshRenderer meshRenderer;
 
     private readonly List<Vector3> vertices = new();
     private readonly List<int> tris = new();
@@ -14,7 +14,6 @@ public class ChunkMesh : MonoBehaviour
     private readonly List<Vector3> normals = new();
 
     private BurstChunkData chunkData;
-    //private ChunkShaderData chunkData;
 
     private int vertexCount = 0;
 
@@ -52,7 +51,6 @@ public class ChunkMesh : MonoBehaviour
     public void Init(bool firstGen)
     {
         meshFilter = GetComponent<MeshFilter>();
-        meshRenderer = GetComponent<MeshRenderer>();
 
         if (firstGen)
         {
@@ -60,7 +58,6 @@ public class ChunkMesh : MonoBehaviour
         }
 
         ClearArrays();
-
         GenerateMesh();
         ApplyMesh();
     }
@@ -242,14 +239,12 @@ public class ChunkMesh : MonoBehaviour
 
     private void ApplyMesh()
     {
-        mesh.vertices = vertices.ToArray();
+        mesh.SetVertices(vertices);
         mesh.SetUVs(0, uvs);
 
         World.instance.material.SetVectorArray("_UVs", uvs);
 
-        mesh.triangles = tris.ToArray();
-
-        meshRenderer.material = material;
+        mesh.SetTriangles(tris, 0);
 
         meshFilter.mesh = mesh;
         mesh.RecalculateNormals();
@@ -263,40 +258,16 @@ public class ChunkMesh : MonoBehaviour
     // move this somewhere or something
     private int BlockToTexture(Utility.Blocks block, Vector3 face)
     {
-        if (block == Utility.Blocks.Stone)
+        return (block, face) switch
         {
-            return 0;
-        }
-        else if (block == Utility.Blocks.Dirt)
-        {
-            return 1;
-        }
-        else if (block == Utility.Blocks.Grass)
-        {
-            if (face == Vector3.left || face == Vector3.right)
-            {
-                return 2;
-            }
-            else if (face == Vector3.up)
-            {
-                return 7;
-            }
-            else if (face == Vector3.down)
-            {
-                return 1;
-            }
-            else
-            {
-                return 2;
-            }
-        }
-        else if (block == Utility.Blocks.Sand)
-        {
-            return 10;
-        }
-        else
-        {
-            return 9;
-        }
+            (Utility.Blocks.Stone, _) => 0,
+            (Utility.Blocks.Dirt, _) => 1,
+            (Utility.Blocks.Grass, Vector3 v) when v == Vector3.left || v == Vector3.right => 2,
+            (Utility.Blocks.Grass, Vector3 v) when v == Vector3.up => 7,
+            (Utility.Blocks.Grass, Vector3 v) when v == Vector3.down => 1,
+            (Utility.Blocks.Grass, _) => 2,
+            (Utility.Blocks.Sand, _) => 10,
+            _ => 9
+        };
     }
 }

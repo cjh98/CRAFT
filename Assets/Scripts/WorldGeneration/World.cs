@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 public class World : MonoBehaviour
 {
@@ -59,8 +60,6 @@ public class World : MonoBehaviour
         StartCoroutine(nameof(DisableOrEnableChunks));
     }
 
-
-
     #region ASYNC
     private IEnumerator CreateChunkMeshes()
     {
@@ -118,6 +117,62 @@ public class World : MonoBehaviour
         yield return null;
     }
     #endregion
+
+    
+
+    private void UpdateWorld()
+    {
+        Vector2Int playerChunk = GetPlayerChunk();
+
+        for (int z = playerChunk.y - range; z < playerChunk.y + range; z++)
+        {
+            for (int x = playerChunk.x - range; x < playerChunk.x + range; x++)
+            {
+                Vector2Int pos = new Vector2Int(x, z);
+
+                if (!chunkDataList.ContainsKey(pos))
+                {
+                    CreateChunkDatas(pos);
+                }
+
+                if (!chunkMeshList.ContainsKey(pos))
+                {
+                    CreateChunkMesh(pos);
+                }
+            }
+        }
+    }
+
+    void CreateChunkDatas(Vector2Int pos)
+    {
+        GameObject chunkObject = Instantiate(chunkDataPrefab, 
+            new Vector3(pos.x * chunkDimensions.x, 0, pos.y * chunkDimensions.z), 
+            Quaternion.identity, 
+            transform);
+
+        var chunkData = chunkObject.GetComponent<BurstChunkData>();
+        chunkData.position = new Vector2Int(pos.x * chunkDimensions.x, pos.y * chunkDimensions.z);
+
+        chunkDataList[pos] = chunkData;
+        chunksDataToGenerate.Enqueue(pos);
+    }
+
+    void CreateChunkMesh(Vector2Int pos)
+    {
+        GameObject chunkObject = Instantiate(
+            chunkMeshPrefab, 
+            new Vector3(pos.x * chunkDimensions.x, 0, pos.y * chunkDimensions.z), 
+            Quaternion.identity, transform);
+
+        if (chunkDataList.TryGetValue(pos, out BurstChunkData chunkData))
+        {
+            ChunkMesh mesh = chunkObject.GetComponent<ChunkMesh>();
+
+            mesh.SetChunkData(chunkData);
+            chunkMeshList[pos] = mesh;
+            chunksMeshesToGenerate.Enqueue(pos);
+        }
+    }
 
     #region HELP
     private Vector2Int GetPlayerChunk()
@@ -187,51 +242,4 @@ public class World : MonoBehaviour
         mesh.Init(false);
     }
     #endregion
-
-    private void UpdateWorld()
-    {
-        Vector2Int playerChunk = GetPlayerChunk();
-
-        for (int z = playerChunk.y - range; z < playerChunk.y + range; z++)
-        {
-            for (int x = playerChunk.x - range; x < playerChunk.x + range; x++)
-            {
-                Vector2Int pos = new Vector2Int(x, z);
-
-                if (!chunkDataList.ContainsKey(pos))
-                {
-                    CreateChunkDatas(pos);
-                }
-
-                if (!chunkMeshList.ContainsKey(pos))
-                {
-                    CreateChunkMesh(pos);
-                }
-            }
-        }
-    }
-
-    void CreateChunkDatas(Vector2Int pos)
-    {
-        GameObject chunkObject = Instantiate(chunkDataPrefab, new Vector3(pos.x * chunkDimensions.x, 0, pos.y * chunkDimensions.z), Quaternion.identity, transform);
-        var chunkData = chunkObject.GetComponent<BurstChunkData>();
-        chunkData.position = new Vector2Int(pos.x * chunkDimensions.x, pos.y * chunkDimensions.z);
-
-        chunkDataList[pos] = chunkData;
-        chunksDataToGenerate.Enqueue(pos);
-    }
-
-    void CreateChunkMesh(Vector2Int pos)
-    {
-        GameObject chunkObject = Instantiate(chunkMeshPrefab, new Vector3(pos.x * chunkDimensions.x, 0, pos.y * chunkDimensions.z), Quaternion.identity, transform);
-
-        if (chunkDataList.TryGetValue(pos, out BurstChunkData chunkData))
-        {
-            ChunkMesh mesh = chunkObject.GetComponent<ChunkMesh>();
-
-            mesh.SetChunkData(chunkData);
-            chunkMeshList[pos] = mesh;
-            chunksMeshesToGenerate.Enqueue(pos);
-        }
-    }
 }

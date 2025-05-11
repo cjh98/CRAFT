@@ -19,10 +19,10 @@ public class WorldPopulator
             return;
         }
 
-        int chunkSize = Utility.CHUNK_X * Utility.CHUNK_Y * Utility.CHUNK_Z;
-        for (int i = 0; i < chunkSize; i++)
+        for (int i = 0; i < Utility.CHUNK_TOTAL_BLOCKS; i++)
         {
             int y = (i / Utility.CHUNK_X) % Utility.CHUNK_Y; // Extract Y coordinate
+            // array bounds check
             if (y < Utility.CHUNK_Y - 1)
             {
                 PlaceSurfaceAndSubsurfaceBlocks(i, chunkData.BlockMap, DefaultBiome);
@@ -32,17 +32,15 @@ public class WorldPopulator
 
     private static void PlaceSurfaceAndSubsurfaceBlocks(int i, NativeArray<Utility.Blocks> map, Biome biome)
     {
-        int chunkWidth = Utility.CHUNK_X;
-        int chunkHeight = Utility.CHUNK_Y;
-
         //int x = i % chunkWidth;
-        int y = (i / chunkWidth) % chunkHeight;
         //int z = i / (chunkWidth * chunkHeight);
 
-        int upY = i + chunkWidth;
-        int downY = i - chunkWidth;
+        int y = (i / Utility.CHUNK_X) % Utility.CHUNK_Y;
 
-        if (y < chunkHeight - 1 && y > 0)
+        int upY = i + Utility.CHUNK_X;
+        int downY = i - Utility.CHUNK_X;
+
+        if (y < Utility.CHUNK_Y - 1 && y > 0)
         {
             // Place surface block
             if (map[upY] == Utility.Blocks.Air && map[downY] == Utility.Blocks.Stone)
@@ -52,7 +50,7 @@ public class WorldPopulator
                 // Place subsurface blocks
                 for (int d = 1; d <= 3; d++)
                 {
-                    int downIndex = i - d * chunkWidth;
+                    int downIndex = i - d * Utility.CHUNK_X;
                     if (downIndex >= 0)
                     {
                         map[downIndex] = biome.subSurfaceBlock;
