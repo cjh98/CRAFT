@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class WorldPopulator
 {
-    private static readonly Biome DefaultBiome = new Biome
+    private static readonly Biome DefaultBiome = new()
     {
         name = "default",
         surfaceBlock = Utility.Blocks.Grass,
