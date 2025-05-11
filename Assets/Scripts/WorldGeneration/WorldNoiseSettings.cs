@@ -12,12 +12,12 @@ public class WorldNoiseSettings : MonoBehaviour
         Instance = this;
     }
 
-    public const float NOISE_SCALE = 65.0f;
-    public const float SQUASH_FACTOR = 3.5f;
-    public const float DEFAULT_HEIGHT_OFFSET = 0.5f;
-    public const int OCTAVES = 4;
-    public const float LACUNARITY = 2.0f;
-    public const float PERSISTENCE = 0.5f;
+    public const float NOISE_SCALE = 65f;                   // default 65.0
+    public const float SQUASH_FACTOR = 3.5f;                // default 3.5
+    public const float DEFAULT_HEIGHT_OFFSET = 0.5f;        // default 0.5
+    public const int OCTAVES = 4;                           // default 4
+    public const float LACUNARITY = 2.0f;                   // default 2.0
+    public const float PERSISTENCE = 0.5f;                  // default 0.2
 
     // continentalness noise parameters
     public const float CONT_SCALE = 50.0f;

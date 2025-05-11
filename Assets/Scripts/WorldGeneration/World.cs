@@ -97,7 +97,7 @@ public class World : MonoBehaviour
     {
         UpdateWorld();
 
-        // Always make chunk data when player moves
+        // Always make chunk data
         if (chunksDataToGenerate.Count > 0 && !isCreatingChunkData)
         {
             StartCoroutine(nameof(CreateChunkData));
@@ -109,6 +109,7 @@ public class World : MonoBehaviour
             StartCoroutine(nameof(CreateChunkMeshes));
         }
 
+        // frustrum culling
         StartCoroutine(nameof(DisableOrEnableChunks));
     }
 

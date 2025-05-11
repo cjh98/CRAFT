@@ -1069,7 +1069,7 @@ MonoBehaviour:
   chunkDataPrefab: {fileID: 393607184177249191, guid: d3849665e948353449f7a3af43cc1268, type: 3}
   shaderDataPrefab: {fileID: 0}
   chunkMeshPrefab: {fileID: 2434145552892773456, guid: 2919c1487f5de49429faf7ab3b667bc3, type: 3}
-  range: 16
+  range: 12
 --- !u!114 &1793214721
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1087,9 +1087,9 @@ MonoBehaviour:
     surfaceBlock: 2
     subSurfaceBlock: 1
     squashFactor: 20
-  - name: Desert
-    surfaceBlock: 4
-    subSurfaceBlock: 4
+  - name: Cave
+    surfaceBlock: 3
+    subSurfaceBlock: 3
     squashFactor: 10
 --- !u!1 &1940016070
 GameObject:

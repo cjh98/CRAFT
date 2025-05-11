@@ -17,11 +17,11 @@ public class WorldNoiseGenerator : MonoBehaviour
 
     private void OnDestroy()
     {
-        Continentalness.Dispose();
-        Erosion.Dispose();
-        Peaks.Dispose();
-        Temperature.Dispose();
-        Humidity.Dispose();
+        //Continentalness.Dispose();
+        //Erosion.Dispose();
+        //Peaks.Dispose();
+        //Temperature.Dispose();
+        //Humidity.Dispose();
     }
 
     public void Init()
