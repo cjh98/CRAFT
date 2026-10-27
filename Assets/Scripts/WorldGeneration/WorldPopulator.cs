@@ -1,4 +1,5 @@
 using Unity.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 
 public class WorldPopulator
@@ -18,45 +19,22 @@ public class WorldPopulator
             Debug.LogError("chunkData is null");
             return;
         }
-
-        for (int i = 0; i < Utility.CHUNK_TOTAL_BLOCKS; i++)
-        {
-            int y = (i / Utility.CHUNK_X) % Utility.CHUNK_Y; // Extract Y coordinate
-            // array bounds check
-            if (y < Utility.CHUNK_Y - 1)
-            {
-                PlaceSurfaceAndSubsurfaceBlocks(i, chunkData.BlockMap, DefaultBiome);
-            }
-        }
     }
 
-    private static void PlaceSurfaceAndSubsurfaceBlocks(int i, NativeArray<Utility.Blocks> map, Biome biome)
-    {
-        //int x = i % chunkWidth;
-        //int z = i / (chunkWidth * chunkHeight);
+    //private static void PlaceSurfaceAndSubsurfaceBlocks(NativeArray<Utility.Blocks> map, Biome biome)
+    //{
+    //    for (int x = 0; x < Utility.CHUNK_X; x++)
+    //    {
+    //        for (int z = 0; z < Utility.CHUNK_Z; z++)
+    //        {
 
-        int y = (i / Utility.CHUNK_X) % Utility.CHUNK_Y;
+    //        }
+    //    }
+    //}
 
-        int upY = i + Utility.CHUNK_X;
-        int downY = i - Utility.CHUNK_X;
+    //private static int FindSurface(int x, int z)
+    //{
+    //    int y = Utility.CHUNK_Y / 2;
 
-        if (y < Utility.CHUNK_Y - 1 && y > 0)
-        {
-            // Place surface block
-            if (map[upY] == Utility.Blocks.Air && map[downY] == Utility.Blocks.Stone)
-            {
-                map[i] = biome.surfaceBlock;
-
-                // Place subsurface blocks
-                for (int d = 1; d <= 3; d++)
-                {
-                    int downIndex = i - d * Utility.CHUNK_X;
-                    if (downIndex >= 0)
-                    {
-                        map[downIndex] = biome.subSurfaceBlock;
-                    }
-                }
-            }
-        }
-    }
+    //}
 }

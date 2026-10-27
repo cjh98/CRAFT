@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 public class World : MonoBehaviour
 {
@@ -57,7 +56,7 @@ public class World : MonoBehaviour
         }
 
         // frustrum culling
-        StartCoroutine(nameof(DisableOrEnableChunks));
+        // StartCoroutine(nameof(DisableOrEnableChunks));
     }
 
     #region ASYNC

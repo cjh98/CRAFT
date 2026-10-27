@@ -1,5 +1,4 @@
 using UnityEngine;
-using System;
 using System.Collections.Generic;
 
 public class ChunkMesh : MonoBehaviour
@@ -54,7 +53,7 @@ public class ChunkMesh : MonoBehaviour
 
         if (firstGen)
         {
-            WorldPopulator.PopulateWorld(chunkData);
+            // WorldPopulator.PopulateWorld(chunkData);
         }
 
         ClearArrays();
@@ -207,14 +206,7 @@ public class ChunkMesh : MonoBehaviour
             uvs.Add(new Vector3(v3.z, v3.y, index));
             uvs.Add(new Vector3(v4.z, v4.y, index));
         }
-        else if (axisMask == Vector3.up)
-        {
-            uvs.Add(new Vector3(v1.x, v1.z, index));
-            uvs.Add(new Vector3(v2.x, v2.z, index));
-            uvs.Add(new Vector3(v3.x, v3.z, index));
-            uvs.Add(new Vector3(v4.x, v4.z, index));
-        }
-        else if (axisMask == Vector3.down)
+        else if (axisMask == Vector3.up || axisMask == Vector3.down)
         {
             uvs.Add(new Vector3(v1.x, v1.z, index));
             uvs.Add(new Vector3(v2.x, v2.z, index));
@@ -242,7 +234,7 @@ public class ChunkMesh : MonoBehaviour
         mesh.SetVertices(vertices);
         mesh.SetUVs(0, uvs);
 
-        World.instance.material.SetVectorArray("_UVs", uvs);
+        // World.instance.material.SetVectorArray("_UVs", uvs);
 
         mesh.SetTriangles(tris, 0);
 

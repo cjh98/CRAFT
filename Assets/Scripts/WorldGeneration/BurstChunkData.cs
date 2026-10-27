@@ -15,9 +15,8 @@ public class BurstChunkData : MonoBehaviour
 
     public void Init()
     {
-        int totalSize = Utility.CHUNK_TOTAL_BLOCKS;
-        DensityMap = new NativeArray<float>(totalSize, Allocator.Persistent);
-        BlockMap = new NativeArray<Utility.Blocks>(totalSize, Allocator.Persistent);
+        DensityMap = new NativeArray<float>(Utility.CHUNK_TOTAL_BLOCKS, Allocator.Persistent);
+        BlockMap = new NativeArray<Utility.Blocks>(Utility.CHUNK_TOTAL_BLOCKS, Allocator.Persistent);
 
         PerlinNoiseJob job = new PerlinNoiseJob
         {
@@ -30,7 +29,7 @@ public class BurstChunkData : MonoBehaviour
             blockMap = BlockMap
         };
 
-        JobHandle jobHandle = job.Schedule(totalSize, 64);
+        JobHandle jobHandle = job.Schedule(Utility.CHUNK_TOTAL_BLOCKS, 64);
         jobHandle.Complete();
 
         position = new Vector2Int(Mathf.FloorToInt(transform.position.x / Utility.CHUNK_X), Mathf.FloorToInt(transform.position.z / Utility.CHUNK_Z));
@@ -75,18 +74,6 @@ public class BurstChunkData : MonoBehaviour
             }
         }
 
-        private void CreateWorldShape(int i)
-        {
-            if (densityMap[i] < 0)
-            {
-                blockMap[i] = Utility.Blocks.Air;
-            }
-            else
-            {
-                blockMap[i] = Utility.Blocks.Stone;
-            }
-        }
-
         public void Execute(int index)
         {
             int area = width * height;
@@ -95,41 +82,32 @@ public class BurstChunkData : MonoBehaviour
             int y = rem / width;
             int x = rem % width;
 
-            float xCoord = ((float)x + position.x);
+            float xCoord = (float)x + position.x;
             float yCoord = y;
-            float zCoord = ((float)z + position.y);
+            float zCoord = (float)z + position.y;
 
             float sample = 0.0f;
             float weight = 1.0f;
             float scale2 = 1.0f;
 
-            int octaves = WorldNoiseSettings.OCTAVES;
-            for (int i = 0; i < octaves - 1; i += 2)
-            {
-                float3 coord1 = new float3(xCoord / scale, yCoord / scale, zCoord / scale) / scale2;
-                float3 coord2 = new float3(xCoord / scale, yCoord / scale, zCoord / scale) / scale2;
-
-                sample += noise.pnoise(coord1, float.MaxValue) * weight;
-                sample += noise.pnoise(coord2, float.MaxValue) * weight;
-
-                weight *= WorldNoiseSettings.PERSISTENCE * WorldNoiseSettings.PERSISTENCE;
-                scale2 *= WorldNoiseSettings.LACUNARITY * WorldNoiseSettings.LACUNARITY;
-            }
-
-            // Handle the last iteration if OCTAVES is an odd number
-            if (octaves % 2 == 1)
+            for (int i = 0; i < WorldNoiseSettings.OCTAVES; i++)
             {
                 float3 coord = new float3(xCoord / scale, yCoord / scale, zCoord / scale) / scale2;
+
                 sample += noise.pnoise(coord, float.MaxValue) * weight;
+
+                weight *= WorldNoiseSettings.PERSISTENCE;
+                scale2 *= WorldNoiseSettings.LACUNARITY;
             }
 
             densityMap[index] = sample * Utility.CHUNK_Y * WorldNoiseSettings.DEFAULT_HEIGHT_OFFSET;
 
             Squash(index, y);
-            CreateWorldShape(index);
+
+            // fill in the world
+            blockMap[index] = densityMap[index] < 0.0f ? Utility.Blocks.Air : Utility.Blocks.Stone;
         }
     }
-
 
     public int GetBlockIndex(int x, int y, int z)
     {
